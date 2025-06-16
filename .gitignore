@@ -1,0 +1,34 @@
+# Build artifacts
+/build/
+/out/
+/bin/
+/lib/
+
+# Compiled objects and binaries
+*.o
+*.obj
+*.so
+*.a
+*.exe
+*.out
+
+# CMake files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Generated content (e.g. for video export)
+frames/
+exports/
+
+# Logs
+*.log
+
+# Editor/IDE settings
+*.swp
+*.swo
+.vscode/
+.idea/
+*.user
+*.DS_Store
