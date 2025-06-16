@@ -28,7 +28,8 @@ find_package(OpenGL REQUIRED)
 # banim library (single TU: init.cpp)
 # ——————————————————————————————————————————————————————————————
 add_library(banim STATIC
-  src/init.cpp            # now contains both init() + draw()
+  src/init.cpp
+  src/shapes.cpp
 )
 
 # Public includes

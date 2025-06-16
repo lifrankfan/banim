@@ -1,39 +1,28 @@
-// main.cpp
 #include "banim/init.h"
-#include <GLFW/glfw3.h>
-#include <cmath>
+#include "banim/shapes.h"
 
 int main() {
-    // 1) Set up the window, GL, Cairo, texture, shaders, etc.
-    banim::InitOptions opts{
-        800,          // width
-        600,          // height
-        "Banim Demo", // window title
-        true          // vsync on
-    };
-    if (!banim::init(opts)) {
+    banim::InitOptions opts = {800, 600, "Banim Example", true};
+    if (!banim::init(opts))
         return -1;
-    }
 
-    // 2) Render loop
+    banim::Scene scene;
+
+    auto rect = std::make_shared<banim::Rectangle>(100, 50, 200, 300);
+    rect->setColor(.0f, .5f, .0f, 1.0f);
+    auto circ =
+        std::make_shared<banim::Circle>(400, 500, 100, 50, 0.0f, 0.5f, 1.0f);
+
+    scene.add(rect);
+    scene.add(circ);
+
     while (!glfwWindowShouldClose(glfwGetCurrentContext())) {
-        banim::draw([](cairo_t *cr) {
-            // clear → (already done by banim)
-
-            // Draw a filled blue square
-            cairo_set_source_rgb(cr, 0.0, 0.0, 1.0);
-            cairo_rectangle(cr, 100.0, 100.0, 200.0, 200.0);
-            cairo_fill(cr);
-
-            // Draw a filled red circle
-            const double cx = 500.0, cy = 350.0, radius = 100.0;
-            cairo_set_source_rgb(cr, 1.0, 0.0, 0.0);
-            cairo_arc(cr, cx, cy, radius, 0.0, 2.0 * M_PI);
-            cairo_fill(cr);
-        });
+        rect->setColor(.0f, .5f, .0f, 1.0f);
+        banim::renderScene(scene);
+        rect->setColor(.5f, .0f, .0f, .5f);
+        banim::renderScene(scene);
     }
 
-    // 3) Tear everything down
     banim::cleanup();
     return 0;
 }

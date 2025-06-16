@@ -12,7 +12,6 @@
 
 namespace banim {
 
-// Impl GLContext
 GLContext *g_ctx = nullptr;
 CairoSurface *g_cairo = nullptr;
 Texture2D *g_tex = nullptr;
@@ -24,6 +23,7 @@ static const char *kVertShader = R"glsl(
 attribute vec2 aPos; attribute vec2 aUV; varying vec2 vUV;
 void main() { vUV = aUV; gl_Position = vec4(aPos, 0.0, 1.0); }
 )glsl";
+
 static const char *kFragShader = R"glsl(
 #version 120
 uniform sampler2D uTex; varying vec2 vUV;
@@ -47,11 +47,6 @@ GLContext::GLContext(int w, int h, const char *title, bool vsync)
     if (glewInit() != GLEW_OK)
         throw std::runtime_error("Failed to init GLEW");
     glViewport(0, 0, w_, h_);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    // setup resize callback
     glfwSetFramebufferSizeCallback(win_, framebufferResizeCallback);
 }
 
@@ -61,18 +56,16 @@ GLContext::~GLContext() {
     glfwTerminate();
 }
 
-void GLContext::framebufferResizeCallback(GLFWwindow *w, int fw, int fh) {
+void GLContext::framebufferResizeCallback(GLFWwindow *, int fw, int fh) {
     if (!g_ctx)
         return;
     g_ctx->w_ = fw;
     g_ctx->h_ = fh;
     glViewport(0, 0, fw, fh);
-    // recreate Cairo & texture
     g_cairo->recreate(fw, fh);
     g_tex->resize(fw, fh);
 }
 
-// Impl CairoSurface
 CairoSurface::CairoSurface(int w, int h) { recreate(w, h); }
 CairoSurface::~CairoSurface() {
     if (cr_)
@@ -97,7 +90,6 @@ void CairoSurface::recreate(int w, int h) {
         throw std::runtime_error("Cairo context creation failed");
 }
 
-// Impl Texture2D
 Texture2D::Texture2D(int w, int h) : tex_w_(w), tex_h_(h) {
     glGenTextures(1, &tex_);
     glBindTexture(GL_TEXTURE_2D, tex_);
@@ -107,10 +99,8 @@ Texture2D::Texture2D(int w, int h) : tex_w_(w), tex_h_(h) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    // initial empty texture
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex_w_, tex_h_, 0, GL_BGRA,
                  GL_UNSIGNED_BYTE, nullptr);
-    // create PBO
     glGenBuffers(1, &pbo_);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo_);
     glBufferData(GL_PIXEL_UNPACK_BUFFER, tex_w_ * tex_h_ * 4, nullptr,
@@ -152,7 +142,6 @@ void Texture2D::upload(const cairo_surface_t *surf) {
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 }
 
-// Impl Shader
 Shader::Shader(const char *vsrc, const char *fsrc) {
     GLuint vs = compile(GL_VERTEX_SHADER, vsrc);
     GLuint fs = compile(GL_FRAGMENT_SHADER, fsrc);
@@ -188,14 +177,12 @@ GLuint Shader::compile(GLenum t, const char *src) {
     return s;
 }
 
-// Public API
 bool init(const InitOptions &opt) {
     try {
         g_ctx = new GLContext(opt.width, opt.height, opt.title, opt.vsync);
         g_cairo = new CairoSurface(opt.width, opt.height);
         g_tex = new Texture2D(opt.width, opt.height);
         g_shader = new Shader(kVertShader, kFragShader);
-        // setup quad VAO/VBO
         float quad[] = {-1, -1, 0, 1, 1, -1, 1, 1, 1, 1, 1, 0, -1, 1, 0, 0};
         glGenVertexArrays(1, &g_vao);
         glGenBuffers(1, &g_vbo);
@@ -218,17 +205,14 @@ bool init(const InitOptions &opt) {
     return true;
 }
 
-void draw(const std::function<void(cairo_t *)> &fn) {
-    // clear Cairo
+void Scene::render() {
     cairo_t *cr = g_cairo->context();
     cairo_set_source_rgb(cr, 1, 1, 1);
     cairo_paint(cr);
-    // user drawing
-    fn(cr);
-    // upload
+    for (auto &shape : shapes_)
+        shape->draw(cr);
     cairo_surface_flush(g_cairo->surface());
     g_tex->upload(g_cairo->surface());
-    // render quad
     glClear(GL_COLOR_BUFFER_BIT);
     g_shader->use();
     glBindVertexArray(g_vao);
@@ -239,6 +223,8 @@ void draw(const std::function<void(cairo_t *)> &fn) {
     glfwSwapBuffers(g_ctx->window());
     glfwPollEvents();
 }
+
+void renderScene(Scene &scene) { scene.render(); }
 
 void cleanup() {
     delete g_shader;

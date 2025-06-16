@@ -1,12 +1,12 @@
-// banim/init.h
 #pragma once
 
+#include "banim/shapes.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <cairo/cairo.h>
+#include <cairo.h>
 #include <functional>
-#include <stdexcept>
-#include <string>
+#include <memory>
+#include <vector>
 
 namespace banim {
 
@@ -17,36 +17,33 @@ struct InitOptions {
     bool vsync;
 };
 
-// RAII wrapper for GLFW + GLEW context
 class GLContext {
   public:
     GLContext(int w, int h, const char *title, bool vsync);
     ~GLContext();
     GLFWwindow *window() const { return win_; }
+    static void framebufferResizeCallback(GLFWwindow *w, int fw, int fh);
     int width() const { return w_; }
     int height() const { return h_; }
-    static void framebufferResizeCallback(GLFWwindow *w, int fw, int fh);
 
   private:
     GLFWwindow *win_ = nullptr;
     int w_, h_;
 };
 
-// RAII wrapper for Cairo surface + context
 class CairoSurface {
   public:
     CairoSurface(int w, int h);
     ~CairoSurface();
     void recreate(int w, int h);
-    cairo_surface_t *surface() const { return surf_; }
     cairo_t *context() const { return cr_; }
+    cairo_surface_t *surface() const { return surf_; }
 
   private:
     cairo_surface_t *surf_ = nullptr;
     cairo_t *cr_ = nullptr;
 };
 
-// RAII wrapper for texture + optional PBO
 class Texture2D {
   public:
     Texture2D(int w, int h);
@@ -56,27 +53,35 @@ class Texture2D {
     GLuint id() const { return tex_; }
 
   private:
+    GLuint tex_ = 0, pbo_ = 0;
     int tex_w_, tex_h_;
-    GLuint tex_ = 0;
-    GLuint pbo_ = 0;
 };
 
-// Simple shader program wrapper
 class Shader {
   public:
-    Shader(const char *vertSrc, const char *fragSrc);
+    Shader(const char *vsrc, const char *fsrc);
     ~Shader();
-    void use() const { glUseProgram(prog_); }
     GLuint id() const { return prog_; }
+    void use() const { glUseProgram(prog_); }
 
   private:
-    GLuint compile(GLenum type, const char *src);
+    GLuint compile(GLenum t, const char *src);
     GLuint prog_ = 0;
 };
 
-// Main init/draw/cleanup API
+class Scene {
+  public:
+    void add(std::shared_ptr<Shape> shape) { shapes_.push_back(shape); }
+    void render();
+
+  private:
+    std::vector<std::shared_ptr<Shape>> shapes_;
+};
+
 bool init(const InitOptions &opt);
-void draw(const std::function<void(cairo_t *)> &fn);
+void renderScene(Scene &scene);
 void cleanup();
+
+extern GLContext *g_ctx;
 
 } // namespace banim
