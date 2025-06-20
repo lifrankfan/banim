@@ -1,5 +1,6 @@
 #include "banim/shapes.h"
-#include <cairo.h>
+#include <cmath>
+#include <memory>
 
 namespace banim {
 
@@ -35,11 +36,11 @@ Rectangle &Rectangle::resize(float width, float height) {
 
 void Rectangle::draw(cairo_t *cr) {
     cairo_save(cr);
-    cairo_translate(cr, x_ + w_ / 2.0f, y_ + h_ / 2.0f);
+    cairo_translate(cr, x_ + w_ / 2, y_ + h_ / 2);
     cairo_rotate(cr, rotation_);
-    cairo_translate(cr, -w_ / 2.0f, -h_ / 2.0f);
-    cairo_set_source_rgba(cr, r_, g_, b_, a_);
+    cairo_translate(cr, -w_ / 2, -h_ / 2);
     cairo_rectangle(cr, 0, 0, w_, h_);
+    cairo_set_source_rgba(cr, r_, g_, b_, a_);
     cairo_fill(cr);
     cairo_restore(cr);
 }
@@ -79,8 +80,8 @@ void Circle::draw(cairo_t *cr) {
     cairo_translate(cr, cx_, cy_);
     cairo_rotate(cr, rotation_);
     cairo_scale(cr, rx_, ry_);
+    cairo_arc(cr, 0, 0, 1.0, 0, 2 * M_PI);
     cairo_set_source_rgba(cr, r_, g_, b_, a_);
-    cairo_arc(cr, 0, 0, 1.0, 0, 2 * 3.14159265);
     cairo_fill(cr);
     cairo_restore(cr);
 }

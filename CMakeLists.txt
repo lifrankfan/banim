@@ -30,6 +30,8 @@ find_package(OpenGL REQUIRED)
 add_library(banim STATIC
   src/init.cpp
   src/shapes.cpp
+  src/scene.cpp
+  src/animations.cpp
 )
 
 # Public includes
@@ -69,10 +71,5 @@ target_link_libraries(banim
 # ——————————————————————————————————————————————————————————————
 # Example executable
 # ——————————————————————————————————————————————————————————————
-add_executable(example
-  examples/example.cpp
-)
-
-target_link_libraries(example
-  PRIVATE banim
-)
+add_executable(example examples/example.cpp)
+target_link_libraries(example PRIVATE banim)

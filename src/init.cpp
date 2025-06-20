@@ -1,4 +1,6 @@
+// Updated init.cpp to match updated init.h and scene separation
 #include "banim/init.h"
+#include "banim/scene.h"
 #include <cstring>
 #include <iostream>
 #include <vector>
@@ -32,11 +34,10 @@ void main() { gl_FragColor = texture2D(uTex, vUV); }
 
 GLContext::GLContext(int w, int h, const char *title, bool vsync)
     : w_(w), h_(h) {
-    std::cout << "GLFW platform: " << glfwGetPlatform() << std::endl;
     if (!glfwInit())
         throw std::runtime_error("Failed to init GLFW");
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     win_ = glfwCreateWindow(w_, h_, title, nullptr, nullptr);
     if (!win_) {
         glfwTerminate();
@@ -208,12 +209,11 @@ bool init(const InitOptions &opt) {
     return true;
 }
 
-void Scene::render() {
+void renderFrame(Scene &scene) {
     cairo_t *cr = g_cairo->context();
     cairo_set_source_rgb(cr, 1, 1, 1);
     cairo_paint(cr);
-    for (auto &shape : shapes_)
-        shape->draw(cr);
+    scene.renderScene(cr);
     cairo_surface_flush(g_cairo->surface());
     g_tex->upload(g_cairo->surface());
     glClear(GL_COLOR_BUFFER_BIT);
@@ -226,8 +226,6 @@ void Scene::render() {
     glfwSwapBuffers(g_ctx->window());
     glfwPollEvents();
 }
-
-void renderScene(Scene &scene) { scene.render(); }
 
 void cleanup() {
     delete g_shader;
