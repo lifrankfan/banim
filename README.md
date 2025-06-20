@@ -1,5 +1,7 @@
 # banim
 
+Wayland users will need to install glfw-wayland
+
 Add VCPKG_ROOT to .bashrc and source:
 
 export VCPKG_ROOT=$HOME/vcpkg

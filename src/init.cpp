@@ -32,6 +32,7 @@ void main() { gl_FragColor = texture2D(uTex, vUV); }
 
 GLContext::GLContext(int w, int h, const char *title, bool vsync)
     : w_(w), h_(h) {
+    std::cout << "GLFW platform: " << glfwGetPlatform() << std::endl;
     if (!glfwInit())
         throw std::runtime_error("Failed to init GLFW");
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
@@ -199,9 +200,11 @@ bool init(const InitOptions &opt) {
                               (void *)(2 * sizeof(float)));
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
-    } catch (...) {
+    } catch (const std::exception &e) {
+        std::cerr << "Initialization error: " << e.what() << std::endl;
         return false;
     }
+
     return true;
 }
 
