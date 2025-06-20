@@ -1,10 +1,16 @@
 #pragma once
 
+#include <memory>
 #include "banim/scene.h"
 #include "banim/shapes.h"
-#include <memory>
 
 namespace banim {
+
+class Animation {
+  public:
+    virtual ~Animation() = default;
+    virtual bool update(float dt) = 0;
+};
 
 class PopIn : public Animation {
   public:
@@ -20,6 +26,20 @@ class PopIn : public Animation {
     float targetW_ = -1.0f, targetH_ = -1.0f;
 
     float easeOutBack(float t, float overshoot);
+};
+
+class MoveTo : public Animation {
+  public:
+    MoveTo(std::shared_ptr<Shape> target, float toX, float toY, float duration);
+    bool update(float dt) override;
+
+  private:
+    std::shared_ptr<Shape> target_;
+    float fromX_, fromY_;
+    float toX_, toY_;
+    float duration_;
+    float elapsed_ = 0.0f;
+    bool initialized_ = false;
 };
 
 } // namespace banim
