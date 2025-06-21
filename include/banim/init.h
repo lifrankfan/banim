@@ -3,7 +3,7 @@
 #include "banim/scene.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <cairo.h>
+#include <cairo/cairo.h>
 
 namespace banim {
 

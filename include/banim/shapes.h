@@ -21,7 +21,8 @@ class Shape {
     }
 
   protected:
-    std::shared_ptr<Animation> spawnAnim_;
+    std::shared_ptr<Animation> spawnAnim_ = nullptr;
+    virtual void initDefaultSpawn() = 0;
 };
 
 class Rectangle : public Shape {
@@ -51,6 +52,8 @@ class Rectangle : public Shape {
     float x_, y_, w_, h_;
     float r_, g_, b_, a_;
     float rotation_;
+
+    void initDefaultSpawn() override;
 };
 
 class Circle : public Shape {
@@ -80,6 +83,8 @@ class Circle : public Shape {
     float cx_, cy_, rx_, ry_;
     float r_, g_, b_, a_;
     float rotation_;
+
+    void initDefaultSpawn() override;
 };
 
 } // namespace banim

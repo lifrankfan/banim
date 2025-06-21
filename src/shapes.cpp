@@ -1,4 +1,5 @@
 #include "banim/shapes.h"
+#include "banim/animations.h"
 #include <cmath>
 #include <memory>
 
@@ -7,7 +8,15 @@ namespace banim {
 Rectangle::Rectangle(float x, float y, float width, float height, float r,
                      float g, float b, float a, float rotation)
     : x_(x), y_(y), w_(width), h_(height), r_(r), g_(g), b_(b), a_(a),
-      rotation_(rotation) {}
+      rotation_(rotation) {
+    initDefaultSpawn();
+}
+
+void Rectangle::initDefaultSpawn() {
+    auto pop = std::make_shared<PopIn>(std::shared_ptr<Shape>(this, [](Shape*){}), 0.5f);
+    pop->setFinalSize(w_, h_);
+    spawnAnim_ = pop;
+}
 
 Rectangle &Rectangle::setColor(float r, float g, float b, float a) {
     r_ = r;
@@ -48,7 +57,15 @@ void Rectangle::draw(cairo_t *cr) {
 Circle::Circle(float cx, float cy, float rx, float ry, float r, float g,
                float b, float a, float rotation)
     : cx_(cx), cy_(cy), rx_(rx), ry_(ry), r_(r), g_(g), b_(b), a_(a),
-      rotation_(rotation) {}
+      rotation_(rotation) {
+    initDefaultSpawn();
+}
+
+void Circle::initDefaultSpawn() {
+    auto pop = std::make_shared<PopIn>(std::shared_ptr<Shape>(this, [](Shape*){}), 0.5f);
+    pop->setFinalSize(rx_, ry_);
+    spawnAnim_ = pop;
+}
 
 Circle &Circle::setColor(float r, float g, float b, float a) {
     r_ = r;

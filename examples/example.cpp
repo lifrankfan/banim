@@ -16,15 +16,14 @@ int main() {
 
     Scene scene;
 
-    // Circle with PopIn animation
+    // Circle with no animation
     auto circle = std::make_shared<Circle>(640, 200, 1.0f, 1.0f);
     circle->setColor(0.8f, 0.3f, 0.2f, 1.0f);
-    auto pop = std::make_shared<PopIn>(circle, 1.5f);
-    pop->setFinalSize(80.0f, 80.0f);
-    circle->setSpawnAnimation(pop);
+    circle->setSpawnAnimation(nullptr); // disables PopIn
     scene.add(circle);
+    
 
-    // Rectangle without any animation
+    // Rectangle popin animation
     auto rect = std::make_shared<Rectangle>(500, 400, 150, 100);
     rect->setColor(0.2f, 0.6f, 0.9f, 1.0f);
     scene.add(rect); // appears immediately
