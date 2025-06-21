@@ -17,9 +17,9 @@ int main() {
     Scene scene;
 
     // Circle with no animation
-    auto circle = std::make_shared<Circle>(640, 200, 1.0f, 1.0f);
+    auto circle = std::make_shared<Circle>(640, 200, 100, 100);
     circle->setColor(0.8f, 0.3f, 0.2f, 1.0f);
-    circle->setSpawnAnimation(nullptr); // disables PopIn
+    circle->setSpawnAnimation(nullptr);
     scene.add(circle);
     
 
