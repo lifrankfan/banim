@@ -13,8 +13,7 @@ Rectangle::Rectangle(float x, float y, float width, float height, float r,
 }
 
 void Rectangle::initDefaultSpawn() {
-    auto pop = std::make_shared<PopIn>(std::shared_ptr<Shape>(this, [](Shape*){}), 0.5f);
-    pop->setFinalSize(w_, h_);
+    auto pop = std::make_shared<PopIn>(std::shared_ptr<Shape>(this, [](Shape*){}));
     spawnAnim_ = pop;
 }
 
@@ -62,8 +61,7 @@ Circle::Circle(float cx, float cy, float rx, float ry, float r, float g,
 }
 
 void Circle::initDefaultSpawn() {
-    auto pop = std::make_shared<PopIn>(std::shared_ptr<Shape>(this, [](Shape*){}), 0.5f);
-    pop->setFinalSize(rx_, ry_);
+    auto pop = std::make_shared<PopIn>(std::shared_ptr<Shape>(this, [](Shape*){}));
     spawnAnim_ = pop;
 }
 
