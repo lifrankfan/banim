@@ -5,15 +5,15 @@
 
 namespace banim {
 
-Rectangle::Rectangle(float x, float y, float width, float height, float r,
+Rectangle::Rectangle(float x, float y, float width, float height, float duration, float r,
                      float g, float b, float a, float rotation)
     : x_(x), y_(y), w_(width), h_(height), r_(r), g_(g), b_(b), a_(a),
       rotation_(rotation) {
-    initDefaultSpawn();
+    initDefaultSpawn(duration);
 }
 
-void Rectangle::initDefaultSpawn() {
-    auto pop = std::make_shared<PopIn>(std::shared_ptr<Shape>(this, [](Shape*){}));
+void Rectangle::initDefaultSpawn(float duration) {
+    auto pop = std::make_shared<PopIn>(std::shared_ptr<Shape>(this, [](Shape*){}), duration);
     spawnAnim_ = pop;
 }
 
@@ -53,15 +53,15 @@ void Rectangle::draw(cairo_t *cr) {
     cairo_restore(cr);
 }
 
-Circle::Circle(float cx, float cy, float rx, float ry, float r, float g,
+Circle::Circle(float cx, float cy, float rx, float ry, float duration, float r, float g,
                float b, float a, float rotation)
     : cx_(cx), cy_(cy), rx_(rx), ry_(ry), r_(r), g_(g), b_(b), a_(a),
       rotation_(rotation) {
-    initDefaultSpawn();
+    initDefaultSpawn(duration);
 }
 
-void Circle::initDefaultSpawn() {
-    auto pop = std::make_shared<PopIn>(std::shared_ptr<Shape>(this, [](Shape*){}));
+void Circle::initDefaultSpawn(float duration) {
+    auto pop = std::make_shared<PopIn>(std::shared_ptr<Shape>(this, [](Shape*){}), duration);
     spawnAnim_ = pop;
 }
 

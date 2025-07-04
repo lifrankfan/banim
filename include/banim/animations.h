@@ -14,7 +14,7 @@ class Animation {
 
 class PopIn : public Animation {
   public:
-    PopIn(std::shared_ptr<Shape> shape, float duration = 1.0f);
+    PopIn(std::shared_ptr<Shape> shape, float duration = 0.5f);
 
     bool update(float dt) override;
 
