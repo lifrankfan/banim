@@ -59,4 +59,12 @@ bool MoveTo::update(float dt) {
     return t < 1.0f;
 }
 
+Wait::Wait(float duration) : duration_(duration) {}
+
+bool Wait::update(float dt) {
+    elapsed_ += dt;
+    return elapsed_ < duration_;
+}
+
+
 } // namespace banim

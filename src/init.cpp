@@ -5,6 +5,9 @@
 #include <iostream>
 #include <vector>
 
+#include <chrono>
+#include <thread>
+
 #define GL_CHECK()                                                             \
     do {                                                                       \
         GLenum err = glGetError();                                             \
@@ -240,6 +243,32 @@ void cleanup() {
         glDeleteVertexArrays(1, &g_vao);
     if (g_vbo)
         glDeleteBuffers(1, &g_vbo);
+}
+
+void run(Scene& scene, bool fixedTimestep /*= true*/, int fps /*= 60*/) {
+    using clock = std::chrono::high_resolution_clock;
+    auto last = clock::now();
+    double dt = 1.0 / static_cast<double>(fps);
+
+    while (!glfwWindowShouldClose(g_ctx->window())) {
+        auto now = clock::now();
+        std::chrono::duration<double> elapsed = now - last;
+
+        if (fixedTimestep) {
+            if (elapsed.count() >= dt) {
+                scene.update(static_cast<float>(dt));
+                renderFrame(scene);
+                last = now;
+            } else {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            }
+        } else {
+            last = now;
+            scene.update(static_cast<float>(elapsed.count()));
+            renderFrame(scene);
+            std::this_thread::sleep_for(std::chrono::duration<double>(dt));
+        }
+    }
 }
 
 } // namespace banim

@@ -69,7 +69,9 @@ private:
 bool init(const InitOptions &opt);
 void renderFrame(Scene &scene);
 void cleanup();
+void run(Scene& scene, bool fixedTimestep = true, int fps = 60);
 
 extern GLContext *g_ctx;
+
 
 } // namespace banim

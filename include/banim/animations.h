@@ -42,4 +42,15 @@ class MoveTo : public Animation {
     bool initialized_ = false;
 };
 
+class Wait : public Animation {
+  public:
+    explicit Wait(float duration);
+    bool update(float dt) override;
+
+  private:
+    float duration_;
+    float elapsed_ = 0.0f;
+};
+
+
 } // namespace banim
