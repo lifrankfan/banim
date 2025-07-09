@@ -4,6 +4,8 @@
 #include "banim/scene.h"
 #include "banim/shapes.h"
 
+#define default_duration 0.5f
+
 namespace banim {
 
 class Animation {
@@ -14,7 +16,7 @@ class Animation {
 
 class PopIn : public Animation {
   public:
-    PopIn(std::shared_ptr<Shape> shape, float duration = 0.5f);
+    PopIn(std::shared_ptr<Shape> shape, float duration = default_duration);
 
     bool update(float dt) override;
 
@@ -22,14 +24,14 @@ class PopIn : public Animation {
     std::shared_ptr<Shape> shape_;
     float elapsed_ = 0.0f;
     float duration_;
-
+    bool started_ = false;
     float targetW_ = -1.0f, targetH_ = -1.0f;
 };
 
 
 class MoveTo : public Animation {
   public:
-    MoveTo(std::shared_ptr<Shape> target, float toX, float toY, float duration);
+    MoveTo(std::shared_ptr<Shape> target, float toX, float toY, float duration = default_duration);
     bool update(float dt) override;
 
   private:
@@ -40,6 +42,21 @@ class MoveTo : public Animation {
     float elapsed_ = 0.0f;
     bool initialized_ = false;
 };
+
+class ResizeTo : public Animation {
+  public:
+    ResizeTo(std::shared_ptr<Shape> shape, float targetW, float targetH, float duration = default_duration);
+    bool update(float dt) override;
+
+  private:
+    std::shared_ptr<Shape> shape_;
+    float startW_ = 0.0f, startH_ = 0.0f;
+    float targetW_, targetH_;
+    float duration_;
+    float elapsed_ = 0.0f;
+    bool initialized_ = false;
+};
+
 
 class Wait : public Animation {
   public:

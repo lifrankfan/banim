@@ -17,7 +17,7 @@ int main() {
     Scene scene;
 
     auto rect = std::make_shared<Rectangle>(100, 100, 150, 80);
-    auto rect2 = std::make_shared<Rectangle>(300, 100, 150, 80, 30.0f);
+    auto rect2 = std::make_shared<Rectangle>(300, 100, 150, 80, 1.0f);
     rect->setColor(0.2f, 0.6f, 0.9f, 1.0f);
     rect2->setColor(0.9f, 0.6f, 0.9f, 1.0f);
 
@@ -28,13 +28,14 @@ int main() {
     scene.add(rect);  
     scene.add(rect2); 
     
-    scene.play(std::make_shared<MoveTo>(rect, 500, 100, 2.5f));
+    scene.play(std::make_shared<MoveTo>(rect, 500, 100, 1.5f));
     scene.play(std::make_shared<PopIn>(circ, 1.0f));
-    rect2->resize(80, 150);
-    scene.play(std::make_shared<PopIn>(rect2, 2.0f));
-    scene.play(std::make_shared<MoveTo>(rect2, 100, 300, 3.0f));
+    scene.play(std::make_shared<ResizeTo>(rect2, 80, 150, 1.0f));
+    scene.play(std::make_shared<ResizeTo>(circ, 100, 100, 1.0f));
+    // scene.play(std::make_shared<PopIn>(rect2, 2.0f));
+    scene.play(std::make_shared<MoveTo>(rect2, 100, 300, 1.0f));
     // scene.play(std::make_shared<PopIn>(rect, 10.0f));
-    scene.play(std::make_shared<MoveTo>(rect, 100, 300, 6.0f));
+    scene.play(std::make_shared<MoveTo>(rect, 100, 300));
 
     run(scene);
 

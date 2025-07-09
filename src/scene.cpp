@@ -15,8 +15,11 @@ namespace banim {
 
     void Scene::add(std::shared_ptr<Shape> shape) {
         shapes_.push_back(shape);
-        if (auto anim = shape->spawnAnimation()) {
-            play(anim);
+        if (auto anim = shape->spawnAnimation()) { // checks if shape has a spawn animation
+            shape->hide(); // hide the shape initially
+            shape->setSpawnAnimation(nullptr); // clear the spawn animation after adding it to the queue
+            animationQueue_.push(anim);
+
         }
     }
 
@@ -39,14 +42,6 @@ namespace banim {
             currentAnimation_ = nullptr;
         }
     }
-
-    for (auto& shape : shapes_) {
-        auto anim = shape->spawnAnimation();
-        if (anim && !anim->update(dt)) {
-            shape->setSpawnAnimation(nullptr);  // remove it once done
-        }
-    }
-    
 }
 
 

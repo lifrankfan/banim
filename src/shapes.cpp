@@ -5,10 +5,12 @@
 
 namespace banim {
 
-Rectangle::Rectangle(float x, float y, float width, float height, float duration, float r,
-                     float g, float b, float a, float rotation)
-    : x_(x), y_(y), w_(width), h_(height), r_(r), g_(g), b_(b), a_(a),
-      rotation_(rotation) {
+// ────────────── RECTANGLE ──────────────
+
+Rectangle::Rectangle(float x, float y, float width, float height, float duration,
+                     float r, float g, float b, float a, float rotation)
+    : x_(x), y_(y), w_(width), h_(height), r_(r), g_(g), b_(b), rotation_(rotation) {
+    a_ = a;
     initDefaultSpawn(duration);
 }
 
@@ -18,10 +20,7 @@ void Rectangle::initDefaultSpawn(float duration) {
 }
 
 Rectangle &Rectangle::setColor(float r, float g, float b, float a) {
-    r_ = r;
-    g_ = g;
-    b_ = b;
-    a_ = a;
+    r_ = r; g_ = g; b_ = b; a_ = a;
     return *this;
 }
 
@@ -30,16 +29,14 @@ Rectangle &Rectangle::setRotation(float rotation) {
     return *this;
 }
 
-Rectangle &Rectangle::moveTo(float x, float y) {
+void Rectangle::setPos(float x, float y) {
     x_ = x;
     y_ = y;
-    return *this;
 }
 
-Rectangle &Rectangle::resize(float width, float height) {
+void Rectangle::setSize(float width, float height) {
     w_ = width;
     h_ = height;
-    return *this;
 }
 
 void Rectangle::draw(cairo_t *cr) {
@@ -53,10 +50,12 @@ void Rectangle::draw(cairo_t *cr) {
     cairo_restore(cr);
 }
 
-Circle::Circle(float cx, float cy, float rx, float ry, float duration, float r, float g,
-               float b, float a, float rotation)
-    : cx_(cx), cy_(cy), rx_(rx), ry_(ry), r_(r), g_(g), b_(b), a_(a),
-      rotation_(rotation) {
+// ────────────── CIRCLE ──────────────
+
+Circle::Circle(float cx, float cy, float rx, float ry, float duration,
+               float r, float g, float b, float a, float rotation)
+    : cx_(cx), cy_(cy), rx_(rx), ry_(ry), r_(r), g_(g), b_(b), rotation_(rotation) {
+    a_ = a;
     initDefaultSpawn(duration);
 }
 
@@ -66,10 +65,7 @@ void Circle::initDefaultSpawn(float duration) {
 }
 
 Circle &Circle::setColor(float r, float g, float b, float a) {
-    r_ = r;
-    g_ = g;
-    b_ = b;
-    a_ = a;
+    r_ = r; g_ = g; b_ = b; a_ = a;
     return *this;
 }
 
@@ -78,16 +74,14 @@ Circle &Circle::setRotation(float rotation) {
     return *this;
 }
 
-Circle &Circle::moveTo(float cx, float cy) {
-    cx_ = cx;
-    cy_ = cy;
-    return *this;
+void Circle::setPos(float x, float y) {
+    cx_ = x;
+    cy_ = y;
 }
 
-Circle &Circle::resize(float rx, float ry) {
+void Circle::setSize(float rx, float ry) {
     rx_ = rx;
     ry_ = ry;
-    return *this;
 }
 
 void Circle::draw(cairo_t *cr) {

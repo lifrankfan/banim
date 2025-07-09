@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.21)
 project(banim LANGUAGES C CXX)
 
+set(CMAKE_BUILD_TYPE Debug CACHE STRING "Debug build") # uncomment for debug build
+
 # ——————————————————————————————————————————————————————————————
 # C++ Standard
 # ——————————————————————————————————————————————————————————————
@@ -73,3 +75,7 @@ target_link_libraries(banim
 # ——————————————————————————————————————————————————————————————
 add_executable(example examples/example.cpp)
 target_link_libraries(example PRIVATE banim)
+
+# debugging options
+target_compile_options(banim PRIVATE -g -O0)
+target_compile_options(example PRIVATE -g -O0)

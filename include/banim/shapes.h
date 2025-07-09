@@ -5,7 +5,7 @@
 
 namespace banim {
 
-class Animation; // forward declaration
+class Animation;
 
 class Shape {
   public:
@@ -14,6 +14,13 @@ class Shape {
     virtual float x() const = 0;
     virtual float y() const = 0;
     virtual void setPos(float x, float y) = 0;
+    virtual void setSize(float w, float h) = 0;
+
+    // Opacity interface
+    virtual void setAlpha(float alpha) { a_ = alpha; }
+    virtual float getAlpha() const { return a_; }
+    virtual void hide() { setAlpha(0.0f); }
+    virtual void show() { setAlpha(1.0f); }
 
     std::shared_ptr<Animation> spawnAnimation() const { return spawnAnim_; }
     void setSpawnAnimation(std::shared_ptr<Animation> anim) {
@@ -23,25 +30,23 @@ class Shape {
   protected:
     std::shared_ptr<Animation> spawnAnim_ = nullptr;
     virtual void initDefaultSpawn(float duration) = 0;
+
+    float a_ = 1.0f;
 };
 
 class Rectangle : public Shape {
   public:
-    Rectangle(float x, float y, float width, float height, float duration = 0.5f, float r = 0.0f,
-              float g = 0.0f, float b = 0.0f, float a = 1.0f,
+    Rectangle(float x, float y, float width, float height, float duration = 0.5f,
+              float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f,
               float rotation = 0.0f);
 
     Rectangle &setColor(float r, float g, float b, float a);
     Rectangle &setRotation(float rotation);
-    Rectangle &moveTo(float x, float y);
-    Rectangle &resize(float width, float height);
 
     float x() const override { return x_; }
     float y() const override { return y_; }
-    void setPos(float x, float y) override {
-        x_ = x;
-        y_ = y;
-    }
+    void setPos(float x, float y) override;
+    void setSize(float width, float height) override;
 
     float getWidth() const { return w_; }
     float getHeight() const { return h_; }
@@ -50,7 +55,7 @@ class Rectangle : public Shape {
 
   private:
     float x_, y_, w_, h_;
-    float r_, g_, b_, a_;
+    float r_, g_, b_;
     float rotation_;
 
     void initDefaultSpawn(float duration) override;
@@ -58,21 +63,17 @@ class Rectangle : public Shape {
 
 class Circle : public Shape {
   public:
-    Circle(float cx, float cy, float rx, float ry, float duration = 0.5f, float r = 0.0f,
-           float g = 0.0f, float b = 0.0f, float a = 1.0f,
+    Circle(float cx, float cy, float rx, float ry, float duration = 0.5f,
+           float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f,
            float rotation = 0.0f);
 
     Circle &setColor(float r, float g, float b, float a);
     Circle &setRotation(float rotation);
-    Circle &moveTo(float cx, float cy);
-    Circle &resize(float rx, float ry);
 
     float x() const override { return cx_; }
     float y() const override { return cy_; }
-    void setPos(float x, float y) override {
-        cx_ = x;
-        cy_ = y;
-    }
+    void setPos(float x, float y) override;
+    void setSize(float rx, float ry) override;
 
     float getRx() const { return rx_; }
     float getRy() const { return ry_; }
@@ -81,7 +82,7 @@ class Circle : public Shape {
 
   private:
     float cx_, cy_, rx_, ry_;
-    float r_, g_, b_, a_;
+    float r_, g_, b_;
     float rotation_;
 
     void initDefaultSpawn(float duration) override;
