@@ -22,6 +22,9 @@ class Shape {
     virtual void hide() { setAlpha(0.0f); }
     virtual void show() { setAlpha(1.0f); }
 
+    virtual Shape& setStrokeWidth(float w) { strokeWidth_ = w; return *this; }
+    virtual float getStrokeWidth() const { return strokeWidth_; }
+
     std::shared_ptr<Animation> spawnAnimation() const { return spawnAnim_; }
     void setSpawnAnimation(std::shared_ptr<Animation> anim) {
         spawnAnim_ = anim;
@@ -32,6 +35,7 @@ class Shape {
     virtual void initDefaultSpawn(float duration) = 0;
 
     float a_ = 1.0f;
+    float strokeWidth_ = 2.0f;
 };
 
 class Rectangle : public Shape {
@@ -46,6 +50,11 @@ class Rectangle : public Shape {
     Rectangle& setFilled(bool filled);
     Rectangle& setBorderRadius(float radius);
     float getBorderRadius() const { return borderRadius_; }
+    Rectangle& setStrokeWidth(float w) override {
+        strokeWidth_ = w;
+        return *this;
+    }
+
 
 
     float x() const override { return x_; }
@@ -79,6 +88,13 @@ class Circle : public Shape {
     Circle &setColor(float r, float g, float b, float a);
     Circle &setRotation(float rotation);
 
+    Circle &setFilled(bool filled);
+    bool isFilled() const { return filled_; }
+    Circle& setStrokeWidth(float w) override {
+    strokeWidth_ = w;
+    return *this;
+}
+
     float x() const override { return cx_; }
     float y() const override { return cy_; }
     void setPos(float x, float y) override;
@@ -93,6 +109,7 @@ class Circle : public Shape {
     float cx_, cy_, rx_, ry_;
     float r_, g_, b_;
     float rotation_;
+    bool filled_ = true; 
 
     void initDefaultSpawn(float duration) override;
 };

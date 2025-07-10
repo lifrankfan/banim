@@ -114,6 +114,19 @@ bool BorderTo::update(float dt) {
 }
 
 
+StrokeTo::StrokeTo(std::shared_ptr<Shape> shape, float targetStroke, float duration)
+    : shape_(shape), targetStroke_(targetStroke), duration_(duration) {
+    startStroke_ = shape_->getStrokeWidth();
+}
+
+bool StrokeTo::update(float dt) {
+    elapsed_ += dt;
+    float t = std::min(elapsed_ / duration_, 1.0f);
+    float newStroke = startStroke_ + t * (targetStroke_ - startStroke_);
+    shape_->setStrokeWidth(newStroke);
+    return t < 1.0f;
+}
+
 Wait::Wait(float duration) : duration_(duration) {}
 
 bool Wait::update(float dt) {

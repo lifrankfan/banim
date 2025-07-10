@@ -72,6 +72,7 @@ void Rectangle::draw(cairo_t* cr) {
     if (filled_) {
         cairo_fill(cr);
     } else {
+        cairo_set_line_width(cr, strokeWidth_);
         cairo_stroke(cr);
     }
 
@@ -112,15 +113,32 @@ void Circle::setSize(float rx, float ry) {
     ry_ = ry;
 }
 
+Circle& Circle::setFilled(bool filled) {
+    filled_ = filled;
+    return *this;
+}
+
 void Circle::draw(cairo_t *cr) {
     cairo_save(cr);
     cairo_translate(cr, cx_, cy_);
     cairo_rotate(cr, rotation_);
-    cairo_scale(cr, rx_, ry_);
-    cairo_arc(cr, 0, 0, 1.0, 0, 2 * M_PI);
+
+    // Manually draw ellipse by approximating scaled circle
+    cairo_save(cr);
+    cairo_scale(cr, rx_, ry_);           // scale the unit circle into an ellipse
+    cairo_arc(cr, 0, 0, 1.0, 0, 2 * M_PI);  // unit circle path
+    cairo_restore(cr);                   // restore so stroke width stays consistent
+
     cairo_set_source_rgba(cr, r_, g_, b_, a_);
-    cairo_fill(cr);
+    if (filled_) {
+        cairo_fill(cr);
+    } else {
+        cairo_set_line_width(cr, strokeWidth_);
+        cairo_stroke(cr);
+    }
+
     cairo_restore(cr);
 }
+
 
 } // namespace banim

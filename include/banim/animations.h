@@ -71,7 +71,6 @@ class BorderTo : public Animation {
     bool initialized_ = false;
 };
 
-
 class Wait : public Animation {
   public:
     explicit Wait(float duration);
@@ -82,5 +81,18 @@ class Wait : public Animation {
     float elapsed_ = 0.0f;
 };
 
+class StrokeTo : public Animation {
+  public:
+    StrokeTo(std::shared_ptr<Shape> shape, float targetStroke, float duration);
+
+    bool update(float dt) override;
+
+  private:
+    std::shared_ptr<Shape> shape_;
+    float startStroke_;
+    float targetStroke_;
+    float duration_;
+    float elapsed_ = 0.0f;
+};
 
 } // namespace banim

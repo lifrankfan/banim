@@ -27,7 +27,7 @@ int main() {
     rect2->setColor(0.9f, 0.6f, 0.9f, 1.0f);
 
     auto circ = std::make_shared<Circle>(400, 300, 50, 50);
-    circ->setColor(0.8f, 0.2f, 0.2f, 1.0f);
+    circ->setColor(0.8f, 0.2f, 0.2f, 1.0f).setFilled(false).setStrokeWidth(10.0f);
     scene.add(circ);
 
     scene.add(rect);  
@@ -35,6 +35,7 @@ int main() {
     
     scene.play(std::make_shared<MoveTo>(rect, 500, 100, 1.5f));
     scene.play(std::make_shared<PopIn>(circ, 1.0f));
+    scene.play(std::make_shared<StrokeTo>(circ, 2.0f, 1.5f));
     scene.play(std::make_shared<BorderTo>(rect, 160.0f, 1.0f));
     scene.play(std::make_shared<ResizeTo>(rect2, 80, 150, 1.0f));
     scene.play(std::make_shared<ResizeTo>(circ, 100, 100, 1.0f));
