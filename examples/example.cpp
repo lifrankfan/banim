@@ -20,8 +20,8 @@ int main() {
 
     auto rect = std::make_shared<Rectangle>(100, 100, 150, 80);
     rect->setColor(0.2f, 0.6f, 0.9f, 1.0f)
-        .setFilled(false)
-        .setBorderRadius(16.0f);
+        .setFilled(false);
+    rect->setBorderRadius(20.0f);
     scene.add(rect);
     auto rect2 = std::make_shared<Rectangle>(300, 100, 150, 80, 1.0f);
     rect2->setColor(0.9f, 0.6f, 0.9f, 1.0f);
