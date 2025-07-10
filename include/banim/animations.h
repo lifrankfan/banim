@@ -57,6 +57,20 @@ class ResizeTo : public Animation {
     bool initialized_ = false;
 };
 
+class BorderTo : public Animation {
+  public:
+    BorderTo(std::shared_ptr<Rectangle> rect, float targetRadius, float duration = default_duration);
+    bool update(float dt) override;
+
+  private:
+    std::shared_ptr<Rectangle> rect_;
+    float startRadius_ = 0.0f;
+    float targetRadius_;
+    float duration_;
+    float elapsed_ = 0.0f;
+    bool initialized_ = false;
+};
+
 
 class Wait : public Animation {
   public:

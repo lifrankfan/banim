@@ -91,6 +91,28 @@ bool ResizeTo::update(float dt) {
     return t < 1.0f;
 }
 
+BorderTo::BorderTo(std::shared_ptr<Rectangle> rect, float targetRadius, float duration)
+    : rect_(rect), targetRadius_(targetRadius), duration_(duration) {}
+
+bool BorderTo::update(float dt) {
+    if (!initialized_) {
+        startRadius_ = rect_->getBorderRadius();  // You'll need a getter
+        initialized_ = true;
+    }
+
+    elapsed_ += dt;
+    float t = elapsed_ / duration_;
+    if (t > 1.0f) t = 1.0f;
+
+    // Ease-in-out interpolation (optional)
+    t = t * t * (3 - 2 * t);
+
+    float newRadius = startRadius_ + (targetRadius_ - startRadius_) * t;
+    rect_->setBorderRadius(newRadius);
+
+    return t < 1.0f;
+}
+
 
 Wait::Wait(float duration) : duration_(duration) {}
 

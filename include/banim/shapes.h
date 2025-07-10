@@ -36,17 +36,23 @@ class Shape {
 
 class Rectangle : public Shape {
   public:
-    Rectangle(float x, float y, float width, float height, float duration = 0.5f,
+    Rectangle(float x, float y, float width, float height,
+              float duration = 0.5f,
               float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f,
               float rotation = 0.0f);
 
-    Rectangle &setColor(float r, float g, float b, float a);
-    Rectangle &setRotation(float rotation);
+    Rectangle& setColor(float r, float g, float b, float a);
+    Rectangle& setRotation(float rotation);
+    Rectangle& setFilled(bool filled);
+    Rectangle& setBorderRadius(float radius);
+    float getBorderRadius() const { return borderRadius_; }
+
 
     float x() const override { return x_; }
     float y() const override { return y_; }
+
     void setPos(float x, float y) override;
-    void setSize(float width, float height) override;
+    void setSize(float w, float h) override;
 
     float getWidth() const { return w_; }
     float getHeight() const { return h_; }
@@ -56,7 +62,10 @@ class Rectangle : public Shape {
   private:
     float x_, y_, w_, h_;
     float r_, g_, b_;
+    float a_;
     float rotation_;
+    bool filled_ = true;
+    float borderRadius_ = 0.0f;
 
     void initDefaultSpawn(float duration) override;
 };

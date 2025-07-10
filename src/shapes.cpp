@@ -7,10 +7,11 @@ namespace banim {
 
 // ────────────── RECTANGLE ──────────────
 
-Rectangle::Rectangle(float x, float y, float width, float height, float duration,
-                     float r, float g, float b, float a, float rotation)
-    : x_(x), y_(y), w_(width), h_(height), r_(r), g_(g), b_(b), rotation_(rotation) {
-    a_ = a;
+Rectangle::Rectangle(float x, float y, float width, float height,
+                     float duration, float r, float g, float b, float a,
+                     float rotation)
+    : x_(x), y_(y), w_(width), h_(height),
+      r_(r), g_(g), b_(b), a_(a), rotation_(rotation) {
     initDefaultSpawn(duration);
 }
 
@@ -19,13 +20,23 @@ void Rectangle::initDefaultSpawn(float duration) {
     spawnAnim_ = pop;
 }
 
-Rectangle &Rectangle::setColor(float r, float g, float b, float a) {
+Rectangle& Rectangle::setColor(float r, float g, float b, float a) {
     r_ = r; g_ = g; b_ = b; a_ = a;
     return *this;
 }
 
-Rectangle &Rectangle::setRotation(float rotation) {
+Rectangle& Rectangle::setRotation(float rotation) {
     rotation_ = rotation;
+    return *this;
+}
+
+Rectangle& Rectangle::setFilled(bool filled) {
+    filled_ = filled;
+    return *this;
+}
+
+Rectangle& Rectangle::setBorderRadius(float radius) {
+    borderRadius_ = radius;
     return *this;
 }
 
@@ -34,19 +45,36 @@ void Rectangle::setPos(float x, float y) {
     y_ = y;
 }
 
-void Rectangle::setSize(float width, float height) {
-    w_ = width;
-    h_ = height;
+void Rectangle::setSize(float w, float h) {
+    w_ = w;
+    h_ = h;
 }
 
-void Rectangle::draw(cairo_t *cr) {
+void Rectangle::draw(cairo_t* cr) {
     cairo_save(cr);
     cairo_translate(cr, x_ + w_ / 2, y_ + h_ / 2);
     cairo_rotate(cr, rotation_);
     cairo_translate(cr, -w_ / 2, -h_ / 2);
-    cairo_rectangle(cr, 0, 0, w_, h_);
+
+    if (borderRadius_ > 0.0f) {
+        float r = std::min(borderRadius_, std::min(w_ / 2, h_ / 2));
+        cairo_new_sub_path(cr);
+        cairo_arc(cr, w_ - r,     r, r, -M_PI_2, 0);
+        cairo_arc(cr, w_ - r, h_ - r, r, 0, M_PI_2);
+        cairo_arc(cr,     r, h_ - r, r, M_PI_2, M_PI);
+        cairo_arc(cr,     r,     r, r, M_PI, 3 * M_PI_2);
+        cairo_close_path(cr);
+    } else {
+        cairo_rectangle(cr, 0, 0, w_, h_);
+    }
+
     cairo_set_source_rgba(cr, r_, g_, b_, a_);
-    cairo_fill(cr);
+    if (filled_) {
+        cairo_fill(cr);
+    } else {
+        cairo_stroke(cr);
+    }
+
     cairo_restore(cr);
 }
 
