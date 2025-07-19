@@ -2,6 +2,7 @@
 #include "banim/scene.h"
 #include "banim/shapes.h"
 #include "banim/animations.h"
+#include <banim/text.h>
 
 #include <memory>
 #include <chrono>
@@ -16,6 +17,9 @@ int main() {
 
     Scene scene;
 
+    auto text = std::make_shared<Text>(200, 300, "Hello, banim!", 32.0f);
+    text->setColor(1.0f, 0.0f, 0.0f);  // red
+    scene.add(text);
 
 
     auto rect = std::make_shared<Rectangle>(100, 100, 150, 80);

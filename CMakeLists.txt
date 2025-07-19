@@ -34,6 +34,7 @@ add_library(banim STATIC
   src/shapes.cpp
   src/scene.cpp
   src/animations.cpp
+  src/text.cpp
 )
 
 # Public includes

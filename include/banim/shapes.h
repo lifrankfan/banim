@@ -21,7 +21,7 @@ class Shape {
     virtual void hide() { setAlpha(0.0f); }
     virtual void show() { setAlpha(1.0f); }
 
-    virtual Shape& setColor(float r, float g, float b, float a) {
+    virtual Shape& setColor(float r, float g, float b, float a = 1.0f) {
         r_ = r; g_ = g; b_ = b; a_ = a;
         return *this;
     }
