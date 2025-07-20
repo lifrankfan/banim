@@ -52,6 +52,11 @@ class Shape : public std::enable_shared_from_this<Shape> {
     
     virtual void initDefaultSpawn(float duration) = 0;
 
+    // Animation interface methods
+    virtual void getAnimatableSize(float& w, float& h) const = 0;
+    virtual void setAnimatableSize(float w, float h) = 0;
+    virtual void resetForAnimation() = 0;
+
   protected:
     float x_ = 0, y_ = 0;
     float r_ = 0, g_ = 0, b_ = 0, a_ = 1;
@@ -80,6 +85,19 @@ class Rectangle : public Shape {
 
     void draw(cairo_t* cr) override;
 
+    void getAnimatableSize(float& w, float& h) const override {
+        w = w_;
+        h = h_;
+    }
+    
+    void setAnimatableSize(float w, float h) override {
+        setSize(w, h);
+    }
+    
+    void resetForAnimation() override {
+        // Rectangle doesn't need special reset logic for most animations
+    }
+
   private:
     float w_ = 0, h_ = 0;
     float borderRadius_ = 0.0f;
@@ -102,6 +120,19 @@ class Circle : public Shape {
     float getRy() const { return ry_; }
 
     void draw(cairo_t* cr) override;
+
+    void getAnimatableSize(float& w, float& h) const override {
+        w = rx_;
+        h = ry_;
+    }
+    
+    void setAnimatableSize(float w, float h) override {
+        setSize(w, h);
+    }
+    
+    void resetForAnimation() override {
+        // Circle doesn't need special reset logic for most animations
+    }
 
   private:
     float rx_ = 0, ry_ = 0;

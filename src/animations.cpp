@@ -10,16 +10,8 @@ namespace banim {
 
 PopIn::PopIn(std::shared_ptr<Shape> shape, float duration)
     : shape_(shape), duration_(duration) {
-    if (auto rect = std::dynamic_pointer_cast<Rectangle>(shape_)) {
-        targetW_ = rect->getWidth();
-        targetH_ = rect->getHeight();
-    } else if (auto circ = std::dynamic_pointer_cast<Circle>(shape_)) {
-        targetW_ = circ->getRx();
-        targetH_ = circ->getRy();
-    } else if (auto text = std::dynamic_pointer_cast<Text>(shape_)) {
-        targetW_ = text->getFontSize();
-        targetH_ = 0;
-    }
+    shape_->getAnimatableSize(targetW_, targetH_);
+    shape_->resetForAnimation();
 }
 
 bool PopIn::update(float dt) {
@@ -34,13 +26,7 @@ bool PopIn::update(float dt) {
         started_ = true;
     }
 
-    if (auto rect = std::dynamic_pointer_cast<Rectangle>(shape_)) {
-        rect->setSize(targetW_ * scale, targetH_ * scale);
-    } else if (auto circ = std::dynamic_pointer_cast<Circle>(shape_)) {
-        circ->setSize(targetW_ * scale, targetH_ * scale);
-    } else if (auto text = std::dynamic_pointer_cast<Text>(shape_)) {
-        text->setFontSize(targetW_ * scale);
-    }
+    shape_->setAnimatableSize(targetW_ * scale, targetH_ * scale);
 
     return t < 1.0f;
 }
@@ -71,13 +57,7 @@ ResizeTo::ResizeTo(std::shared_ptr<Shape> shape, float targetW, float targetH, f
 
 bool ResizeTo::update(float dt) {
     if (!initialized_) {
-        if (auto rect = std::dynamic_pointer_cast<Rectangle>(shape_)) {
-            startW_ = rect->getWidth();
-            startH_ = rect->getHeight();
-        } else if (auto circ = std::dynamic_pointer_cast<Circle>(shape_)) {
-            startW_ = circ->getRx();
-            startH_ = circ->getRy();
-        }
+        shape_->getAnimatableSize(startW_, startH_);
         initialized_ = true;
     }
 
@@ -87,7 +67,8 @@ bool ResizeTo::update(float dt) {
 
     float newW = startW_ + (targetW_ - startW_) * t;
     float newH = startH_ + (targetH_ - startH_) * t;
-    shape_->setSize(newW, newH);
+    
+    shape_->setAnimatableSize(newW, newH);
 
     return t < 1.0f;
 }

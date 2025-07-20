@@ -19,6 +19,19 @@ public:
     void draw(cairo_t* cr) override;
     void setSize(float w, float h) override;
 
+    void getAnimatableSize(float& w, float& h) const override {
+        w = fontSize_;
+        h = fontSize_;
+    }
+    
+    void setAnimatableSize(float w, float h) override {
+        setFontSize(w);
+    }
+    
+    void resetForAnimation() override {
+        // Text doesn't need special reset logic for most animations
+    }
+
 private:
     std::string content_;
     float fontSize_;
