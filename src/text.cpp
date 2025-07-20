@@ -34,8 +34,4 @@ void Text::draw(cairo_t* cr) {
 void Text::setSize(float w, float h) {
 }
 
-void Text::initDefaultSpawn(float duration) {
-    spawnAnim_ = std::make_shared<PopIn>(shared_from_this(), duration_);
-}
-
 } // namespace banim

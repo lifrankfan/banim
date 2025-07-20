@@ -45,13 +45,6 @@ class Shape : public std::enable_shared_from_this<Shape> {
 
     virtual float getStrokeWidth() const { return strokeWidth_; }
 
-    std::shared_ptr<Animation> spawnAnimation() const { return spawnAnim_; }
-    void setSpawnAnimation(std::shared_ptr<Animation> anim) {
-        spawnAnim_ = anim;
-    }
-    
-    virtual void initDefaultSpawn(float duration) = 0;
-
     // Animation interface methods
     virtual void getAnimatableSize(float& w, float& h) const = 0;
     virtual void setAnimatableSize(float w, float h) = 0;
@@ -63,8 +56,6 @@ class Shape : public std::enable_shared_from_this<Shape> {
     float rotation_ = 0;
     float strokeWidth_ = 2.0f;
     bool filled_ = true;
-
-    std::shared_ptr<Animation> spawnAnim_ = nullptr;
 };
 
 class Rectangle : public Shape {
@@ -115,8 +106,6 @@ class Rectangle : public Shape {
     float borderRadius_ = 0.0f;
     float duration_;
     float centerX_ = 0, centerY_ = 0; // For center-based animation scaling
-
-    void initDefaultSpawn(float duration) override;
 };
 
 class Circle : public Shape {
@@ -151,8 +140,6 @@ class Circle : public Shape {
   private:
     float rx_ = 0, ry_ = 0;
     float duration_;
-
-    void initDefaultSpawn(float duration) override;
 };
 
 } // namespace banim

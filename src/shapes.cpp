@@ -59,10 +59,6 @@ void Rectangle::draw(cairo_t* cr) {
     cairo_restore(cr);
 }
 
-void Rectangle::initDefaultSpawn(float duration) {
-    spawnAnim_ = std::make_shared<PopIn>(shared_from_this(), duration_);
-}
-
 // ────────────── CIRCLE ──────────────
 
 Circle::Circle(float cx, float cy, float rx, float ry,
@@ -103,10 +99,6 @@ void Circle::draw(cairo_t *cr) {
     }
 
     cairo_restore(cr);
-}
-
-void Circle::initDefaultSpawn(float duration) {
-    spawnAnim_ = std::make_shared<PopIn>(shared_from_this(), duration_);
 }
 
 } // namespace banim

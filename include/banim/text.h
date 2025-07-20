@@ -25,36 +25,28 @@ public:
     }
     
     void setAnimatableSize(float w, float h) override {
-        // Center-based scaling: adjust position as font size changes
-        float oldFontSize = fontSize_;
-        setFontSize(w);
+        // For text, we scale by changing the font size
+        // and reposition to keep the visual center fixed
         
-        if (oldFontSize > 0) {
-            float fontScale = w / oldFontSize;
-            
-            float oldWidth = content_.length() * oldFontSize * 0.6f;
-            float oldHeight = oldFontSize * 0.8f;
-            
-            float newWidth = oldWidth * fontScale;
-            float newHeight = oldHeight * fontScale;
-            
-            float widthDiff = newWidth - oldWidth;
-            float heightDiff = newHeight - oldHeight;
-            
-            x_ = centerX_ - newWidth * 0.5f;
-            y_ = centerY_ + newHeight * 0.3f;
-
-            x_ = centerX_;
-            y_ = centerY_;
-        }
+        setFontSize(w);  // Use width as the new font size
+        
+        // Calculate new text dimensions
+        float textWidth = content_.length() * fontSize_ * 0.6f;
+        float textHeight = fontSize_;
+        
+        // Position the text so its visual center stays at centerX_, centerY_
+        x_ = centerX_ - textWidth * 0.5f;
+        y_ = centerY_ + textHeight * 0.3f;  // Adjust for baseline positioning
     }
     
     void resetForAnimation() override {
+        // Calculate current text dimensions and store the visual center
         float textWidth = content_.length() * fontSize_ * 0.6f;
-        float textHeight = fontSize_ * 0.8f;
+        float textHeight = fontSize_;
         
+        // Store the visual center based on current position
         centerX_ = x_ + textWidth * 0.5f;
-        centerY_ = y_ - textHeight * 0.3f;
+        centerY_ = y_ - textHeight * 0.3f;  // Move up from baseline to visual center
     }
 
 private:
@@ -62,7 +54,6 @@ private:
     float fontSize_;
     float duration_;
     float centerX_ = 0, centerY_ = 0;
-    void initDefaultSpawn(float duration) override;
 };
 
 } // namespace banim
