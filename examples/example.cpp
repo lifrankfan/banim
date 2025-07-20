@@ -17,8 +17,8 @@ int main() {
 
     Scene scene;
 
-    auto text = std::make_shared<Text>(200, 300, "Hello, banim!", 32.0f);
-    text->setColor(1.0f, 0.0f, 0.0f);  // red
+    auto text = std::make_shared<Text>(200, 300, "Hello, banim!", 32.0f, 5.0f);
+    text->setColor(1.0f, 0.0f, 0.0f);
     scene.add(text);
 
 

@@ -15,11 +15,13 @@ namespace banim {
 
     void Scene::add(std::shared_ptr<Shape> shape) {
         shapes_.push_back(shape);
-        if (auto anim = shape->spawnAnimation()) { // checks if shape has a spawn animation
-            shape->hide(); // hide the shape initially
-            shape->setSpawnAnimation(nullptr); // clear the spawn animation after adding it to the queue
+        
+        shape->initDefaultSpawn(0.5f);
+        
+        if (auto anim = shape->spawnAnimation()) {
+            shape->hide();
+            shape->setSpawnAnimation(nullptr);
             animationQueue_.push(anim);
-
         }
     }
 
@@ -31,7 +33,6 @@ namespace banim {
     }
 
     void Scene::update(float dt) {
-    // Run current animation from the timeline
     if (!currentAnimation_ && !animationQueue_.empty()) {
         currentAnimation_ = animationQueue_.front();
         animationQueue_.pop();

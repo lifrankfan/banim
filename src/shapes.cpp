@@ -9,12 +9,11 @@ namespace banim {
 
 Rectangle::Rectangle(float x, float y, float width, float height,
                      float duration, float r, float g, float b, float a,
-                     float rotation) {
+                     float rotation) : duration_(duration) {
     x_ = x; y_ = y;
     w_ = width; h_ = height;
     r_ = r; g_ = g; b_ = b; a_ = a;
     rotation_ = rotation;
-    initDefaultSpawn(duration);
 }
 
 Rectangle& Rectangle::setBorderRadius(float radius) {
@@ -61,20 +60,18 @@ void Rectangle::draw(cairo_t* cr) {
 }
 
 void Rectangle::initDefaultSpawn(float duration) {
-    auto pop = std::make_shared<PopIn>(std::shared_ptr<Shape>(this, [](Shape*){}), duration);
-    spawnAnim_ = pop;
+    spawnAnim_ = std::make_shared<PopIn>(shared_from_this(), duration_);
 }
 
 // ────────────── CIRCLE ──────────────
 
 Circle::Circle(float cx, float cy, float rx, float ry,
                float duration, float r, float g, float b, float a,
-               float rotation) {
+               float rotation) : duration_(duration) {
     x_ = cx; y_ = cy;
     rx_ = rx; ry_ = ry;
     r_ = r; g_ = g; b_ = b; a_ = a;
     rotation_ = rotation;
-    initDefaultSpawn(duration);
 }
 
 void Circle::setPos(float x, float y) {
@@ -92,11 +89,10 @@ void Circle::draw(cairo_t *cr) {
     cairo_translate(cr, x_, y_);
     cairo_rotate(cr, rotation_);
 
-    // Manually draw ellipse by approximating scaled circle
     cairo_save(cr);
-    cairo_scale(cr, rx_, ry_);           // scale the unit circle into an ellipse
-    cairo_arc(cr, 0, 0, 1.0, 0, 2 * M_PI);  // unit circle path
-    cairo_restore(cr);                   // restore so stroke width stays consistent
+    cairo_scale(cr, rx_, ry_);
+    cairo_arc(cr, 0, 0, 1.0, 0, 2 * M_PI);
+    cairo_restore(cr);
 
     cairo_set_source_rgba(cr, r_, g_, b_, a_);
     if (filled_) {
@@ -110,8 +106,7 @@ void Circle::draw(cairo_t *cr) {
 }
 
 void Circle::initDefaultSpawn(float duration) {
-    auto pop = std::make_shared<PopIn>(std::shared_ptr<Shape>(this, [](Shape*){}), duration);
-    spawnAnim_ = pop;
+    spawnAnim_ = std::make_shared<PopIn>(shared_from_this(), duration_);
 }
 
 } // namespace banim

@@ -1,13 +1,15 @@
 #include "banim/text.h"
+#include "banim/animations.h"
 
 namespace banim {
 
 Text::Text(float x, float y,
            const std::string& content,
-           float fontSize)
-    : content_(content), fontSize_(fontSize)       // no Shape(x,y) ctor → set fields
+           float fontSize,
+           float duration)
+    : content_(content), fontSize_(fontSize), duration_(duration)
 {
-    x_ = x;                                        // inherited protected vars
+    x_ = x;
     y_ = y;
 }
 
@@ -33,7 +35,7 @@ void Text::setSize(float w, float h) {
 }
 
 void Text::initDefaultSpawn(float duration) {
+    spawnAnim_ = std::make_shared<PopIn>(shared_from_this(), duration_);
 }
-
 
 } // namespace banim

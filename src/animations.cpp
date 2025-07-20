@@ -1,5 +1,6 @@
 #include "banim/animations.h"
 #include <banim/shapes.h>
+#include <banim/text.h>
 #include <cmath>
 #include <algorithm>
 
@@ -7,16 +8,17 @@
 
 namespace banim {
 
-    PopIn::PopIn(std::shared_ptr<Shape> shape, float duration)
+PopIn::PopIn(std::shared_ptr<Shape> shape, float duration)
     : shape_(shape), duration_(duration) {
     if (auto rect = std::dynamic_pointer_cast<Rectangle>(shape_)) {
         targetW_ = rect->getWidth();
         targetH_ = rect->getHeight();
-        // rect->resize(0.0f, 0.0f); 
     } else if (auto circ = std::dynamic_pointer_cast<Circle>(shape_)) {
         targetW_ = circ->getRx();
         targetH_ = circ->getRy();
-        // circ->resize(0.0f, 0.0f);
+    } else if (auto text = std::dynamic_pointer_cast<Text>(shape_)) {
+        targetW_ = text->getFontSize();
+        targetH_ = 0;
     }
 }
 
@@ -29,17 +31,16 @@ bool PopIn::update(float dt) {
 
     if (!started_) {
         shape_->show();
-    started_ = true;
-}
-
+        started_ = true;
+    }
 
     if (auto rect = std::dynamic_pointer_cast<Rectangle>(shape_)) {
         rect->setSize(targetW_ * scale, targetH_ * scale);
     } else if (auto circ = std::dynamic_pointer_cast<Circle>(shape_)) {
         circ->setSize(targetW_ * scale, targetH_ * scale);
+    } else if (auto text = std::dynamic_pointer_cast<Text>(shape_)) {
+        text->setFontSize(targetW_ * scale);
     }
-
-    
 
     return t < 1.0f;
 }
@@ -96,7 +97,7 @@ BorderTo::BorderTo(std::shared_ptr<Rectangle> rect, float targetRadius, float du
 
 bool BorderTo::update(float dt) {
     if (!initialized_) {
-        startRadius_ = rect_->getBorderRadius();  // You'll need a getter
+        startRadius_ = rect_->getBorderRadius();
         initialized_ = true;
     }
 
@@ -104,7 +105,7 @@ bool BorderTo::update(float dt) {
     float t = elapsed_ / duration_;
     if (t > 1.0f) t = 1.0f;
 
-    // Ease-in-out interpolation (optional)
+    // Ease-in-out interpolation
     t = t * t * (3 - 2 * t);
 
     float newRadius = startRadius_ + (targetRadius_ - startRadius_) * t;

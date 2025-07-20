@@ -7,7 +7,7 @@ namespace banim {
 
 class Animation;
 
-class Shape {
+class Shape : public std::enable_shared_from_this<Shape> {
   public:
     virtual ~Shape() = default;
     virtual void draw(cairo_t* cr) = 0;
@@ -49,6 +49,8 @@ class Shape {
     void setSpawnAnimation(std::shared_ptr<Animation> anim) {
         spawnAnim_ = anim;
     }
+    
+    virtual void initDefaultSpawn(float duration) = 0;
 
   protected:
     float x_ = 0, y_ = 0;
@@ -58,7 +60,6 @@ class Shape {
     bool filled_ = true;
 
     std::shared_ptr<Animation> spawnAnim_ = nullptr;
-    virtual void initDefaultSpawn(float duration) = 0;
 };
 
 class Rectangle : public Shape {
@@ -82,6 +83,7 @@ class Rectangle : public Shape {
   private:
     float w_ = 0, h_ = 0;
     float borderRadius_ = 0.0f;
+    float duration_;
 
     void initDefaultSpawn(float duration) override;
 };
@@ -103,6 +105,7 @@ class Circle : public Shape {
 
   private:
     float rx_ = 0, ry_ = 0;
+    float duration_;
 
     void initDefaultSpawn(float duration) override;
 };
