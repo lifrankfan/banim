@@ -91,17 +91,30 @@ class Rectangle : public Shape {
     }
     
     void setAnimatableSize(float w, float h) override {
-        setSize(w, h);
+        // Center-based scaling: keep center point fixed
+        float centerX = x_ + w_ / 2.0f;
+        float centerY = y_ + h_ / 2.0f;
+        
+        // Update size
+        w_ = w;
+        h_ = h;
+        
+        // Adjust position to keep center fixed
+        x_ = centerX - w_ / 2.0f;
+        y_ = centerY - h_ / 2.0f;
     }
     
     void resetForAnimation() override {
-        // Rectangle doesn't need special reset logic for most animations
+        // Store the original center point for animation
+        centerX_ = x_ + w_ / 2.0f;
+        centerY_ = y_ + h_ / 2.0f;
     }
 
   private:
     float w_ = 0, h_ = 0;
     float borderRadius_ = 0.0f;
     float duration_;
+    float centerX_ = 0, centerY_ = 0; // For center-based animation scaling
 
     void initDefaultSpawn(float duration) override;
 };
@@ -127,11 +140,12 @@ class Circle : public Shape {
     }
     
     void setAnimatableSize(float w, float h) override {
+        // Circles are already center-based (x_, y_ is the center)
         setSize(w, h);
     }
     
     void resetForAnimation() override {
-        // Circle doesn't need special reset logic for most animations
+        // Circles don't need special center tracking since they're already centered
     }
 
   private:
