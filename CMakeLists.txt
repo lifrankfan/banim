@@ -35,6 +35,9 @@ add_library(banim STATIC
   src/scene.cpp
   src/animations.cpp
   src/text.cpp
+  src/easing.cpp
+  src/style.cpp
+  src/arch_components.cpp
 )
 
 # Public includes
@@ -72,11 +75,15 @@ target_link_libraries(banim
 )
 
 # ——————————————————————————————————————————————————————————————
-# Example executable
+# Example executables
 # ——————————————————————————————————————————————————————————————
 add_executable(example examples/example.cpp)
 target_link_libraries(example PRIVATE banim)
 
+add_executable(architecture_demo examples/architecture_demo.cpp)
+target_link_libraries(architecture_demo PRIVATE banim)
+
 # debugging options
 target_compile_options(banim PRIVATE -g -O0)
 target_compile_options(example PRIVATE -g -O0)
+target_compile_options(architecture_demo PRIVATE -g -O0)

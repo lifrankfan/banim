@@ -3,6 +3,7 @@
 #include <memory>
 #include "banim/scene.h"
 #include "banim/shapes.h"
+#include "banim/easing.h"
 
 #define default_duration 0.5f
 
@@ -12,6 +13,14 @@ class Animation {
   public:
     virtual ~Animation() = default;
     virtual bool update(float dt) = 0;
+    
+    // Common animation properties
+    void setEasing(EasingType easing) { easingType_ = easing; }
+    EasingType getEasing() const { return easingType_; }
+    
+  protected:
+    float applyEasing(float t) const { return Easing::apply(t, easingType_); }
+    EasingType easingType_ = EasingType::EaseInOut;
 };
 
 class PopIn : public Animation {
