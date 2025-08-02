@@ -36,6 +36,7 @@ add_library(banim STATIC
   src/animations.cpp
   src/text.cpp
   src/wires.cpp
+  src/block.cpp
 )
 
 # Public includes
@@ -80,6 +81,9 @@ target_link_libraries(example PRIVATE banim)
 
 add_executable(grid_demo examples/grid_demo.cpp)
 target_link_libraries(grid_demo PRIVATE banim)
+
+add_executable(block_demo examples/block_demo.cpp)
+target_link_libraries(block_demo PRIVATE banim)
 
 # debugging options
 target_compile_options(banim PRIVATE -g -O0)

@@ -25,7 +25,7 @@ int main() {
     scene.add(title);
 
     // Create rectangles that are exactly 1 grid cell in size
-    auto rect1 = std::make_shared<Rectangle>(GridCoord(2, 3), 1.0f, 1.0f, &scene);
+    auto rect1 = std::make_shared<Rectangle>(GridCoord(0, 0), 1.0f, 1.0f, &scene);
     rect1->setColor(0.8f, 0.2f, 0.2f, 1.0f);
     scene.add(rect1);
 
@@ -54,7 +54,7 @@ int main() {
     scene.wait(1.0f);
     
     // Move rectangles
-    scene.play(std::make_shared<MoveTo>(rect1, GridCoord(7, 3), &scene, 1.5f));
+    // scene.play(std::make_shared<MoveTo>(rect1, GridCoord(7, 3), &scene, 1.5f));
     scene.play(std::make_shared<MoveTo>(rect2, GridCoord(8, 3), &scene, 1.5f));
     scene.play(std::make_shared<MoveTo>(rect3, GridCoord(9, 3), &scene, 1.5f));
     
