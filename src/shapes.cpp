@@ -34,26 +34,18 @@ Rectangle::Rectangle(float x, float y, float width, float height,
     rotation_ = rotation;
 }
 
-Rectangle::Rectangle(const GridCoord& gridPos, float gridWidth, float gridHeight, const Scene* scene,
+Rectangle::Rectangle(const GridCoord& gridPos, float gridWidth, float gridHeight,
                      float duration, float r, float g, float b, float a, float rotation) 
     : duration_(duration) {
     r_ = r; g_ = g; b_ = b; a_ = a;
     rotation_ = rotation;
+    coordinateSystem_ = CoordinateSystem::GRID;
+    gridPos_ = gridPos;
+    gridSize_ = {gridWidth, gridHeight};
     
-    if (scene) {
-        auto [cellWidth, cellHeight] = scene->getGridCellSize();
-        w_ = gridWidth * cellWidth;
-        h_ = gridHeight * cellHeight;
-        
-        auto [pixelX, pixelY] = scene->gridToPixel(gridPos);
-        x_ = pixelX - w_ / 2.0f;  // Center the rectangle on the grid position
-        y_ = pixelY - h_ / 2.0f;
-    } else {
-        w_ = gridWidth;
-        h_ = gridHeight;
-        x_ = gridPos.x;
-        y_ = gridPos.y;
-    }
+    // Set temporary values - will be updated when added to scene
+    x_ = 0; y_ = 0;
+    w_ = 100; h_ = 100; // Default size
 }
 
 Rectangle& Rectangle::setBorderRadius(float radius) {
@@ -109,6 +101,18 @@ void Rectangle::draw(cairo_t* cr) {
     cairo_restore(cr);
 }
 
+void Rectangle::updateFromGrid(const Scene* scene) {
+    if (coordinateSystem_ == CoordinateSystem::GRID && scene) {
+        auto [cellWidth, cellHeight] = scene->getGridCellSize();
+        w_ = gridSize_.first * cellWidth;
+        h_ = gridSize_.second * cellHeight;
+        
+        auto [pixelX, pixelY] = scene->gridToPixel(gridPos_);
+        x_ = pixelX - w_ / 2.0f;  // Center the rectangle on the grid position
+        y_ = pixelY - h_ / 2.0f;
+    }
+}
+
 // ────────────── CIRCLE ──────────────
 
 Circle::Circle(float cx, float cy, float rx, float ry,
@@ -120,28 +124,18 @@ Circle::Circle(float cx, float cy, float rx, float ry,
     rotation_ = rotation;
 }
 
-Circle::Circle(const GridCoord& gridPos, float gridRx, float gridRy, const Scene* scene,
+Circle::Circle(const GridCoord& gridPos, float gridRx, float gridRy,
                float duration, float r, float g, float b, float a, float rotation)
     : duration_(duration) {
     r_ = r; g_ = g; b_ = b; a_ = a;
     rotation_ = rotation;
+    coordinateSystem_ = CoordinateSystem::GRID;
+    gridPos_ = gridPos;
+    gridSize_ = {gridRx, gridRy};
     
-    if (scene) {
-        auto [cellWidth, cellHeight] = scene->getGridCellSize();
-        // For circles to match grid cell size: gridRx is the radius in grid units
-        // So if gridRx = 0.5, the circle diameter = 1 grid cell
-        rx_ = gridRx * cellWidth;
-        ry_ = gridRy * cellHeight;
-        
-        auto [pixelX, pixelY] = scene->gridToPixel(gridPos);
-        x_ = pixelX;  // Circle center is at the grid position
-        y_ = pixelY;
-    } else {
-        rx_ = gridRx;
-        ry_ = gridRy;
-        x_ = gridPos.x;
-        y_ = gridPos.y;
-    }
+    // Set temporary values - will be updated when added to scene
+    x_ = 0; y_ = 0;
+    rx_ = 50; ry_ = 50; // Default radius
 }
 
 void Circle::setPos(float x, float y) {
@@ -183,6 +177,18 @@ void Circle::draw(cairo_t *cr) {
     }
 
     cairo_restore(cr);
+}
+
+void Circle::updateFromGrid(const Scene* scene) {
+    if (coordinateSystem_ == CoordinateSystem::GRID && scene) {
+        auto [cellWidth, cellHeight] = scene->getGridCellSize();
+        rx_ = gridSize_.first * cellWidth;
+        ry_ = gridSize_.second * cellHeight;
+        
+        auto [pixelX, pixelY] = scene->gridToPixel(gridPos_);
+        x_ = pixelX;  // Circle center is at the grid position
+        y_ = pixelY;
+    }
 }
 
 } // namespace banim

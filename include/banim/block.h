@@ -30,9 +30,9 @@ struct Port {
 // Generic block class for architecture diagrams
 class Block : public Rectangle {
 public:
-    // Create a block at grid position with specified size
+    // Create a block at grid position with specified size (no scene parameter needed!)
     Block(const GridCoord& position, float gridWidth, float gridHeight, 
-          const std::string& label, const Scene* scene);
+          const std::string& label);
     
     // Create a block with pixel coordinates (for backward compatibility)
     Block(float x, float y, float width, float height, const std::string& label);
@@ -76,6 +76,9 @@ public:
     void resetForAnimation() override {
         // Blocks don't need special animation reset
     }
+    
+    // Override updateFromGrid to also update port positions
+    void updateFromGrid(const Scene* scene) override;
 
 private:
     std::string label_;

@@ -7,11 +7,11 @@
 namespace banim {
 
 Block::Block(const GridCoord& position, float gridWidth, float gridHeight, 
-             const std::string& label, const Scene* scene)
-    : Rectangle(position, gridWidth, gridHeight, scene), 
+             const std::string& label)
+    : Rectangle(position, gridWidth, gridHeight), 
       label_(label), labelSize_(14.0f), 
       labelR_(1.0f), labelG_(1.0f), labelB_(1.0f), labelA_(1.0f),
-      scene_(scene), useGridSystem_(true) {
+      scene_(nullptr), useGridSystem_(true) {
     
     // Set default appearance
     setColor(0.3f, 0.3f, 0.7f, 1.0f);
@@ -149,6 +149,12 @@ void Block::setLabelColor(float r, float g, float b, float a) {
 
 void Block::setSize(float w, float h) {
     Rectangle::setSize(w, h);
+    updatePortPositions();
+}
+
+void Block::updateFromGrid(const Scene* scene) {
+    Rectangle::updateFromGrid(scene);
+    scene_ = scene; // Update scene reference
     updatePortPositions();
 }
 

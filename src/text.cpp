@@ -12,29 +12,22 @@ Text::Text(float x, float y,
 {
     x_ = x;
     y_ = y;
+    coordinateSystem_ = CoordinateSystem::PIXEL;
 }
 
 Text::Text(const GridCoord& gridPos,
            const std::string& content,
            float fontSize,
-           const Scene* scene,
            float duration)
     : content_(content), fontSize_(fontSize), duration_(duration)
 {
-    if (scene) {
-        auto [pixelX, pixelY] = scene->gridToPixel(gridPos);
-        
-        // Calculate text dimensions for centering
-        float textWidth = content_.length() * fontSize_ * 0.6f;  // Rough estimation
-        float textHeight = fontSize_;
-        
-        // Position text so its visual center is at the grid position
-        x_ = pixelX - textWidth * 0.5f;
-        y_ = pixelY + textHeight * 0.3f;  // Adjust for baseline positioning
-    } else {
-        x_ = gridPos.x;
-        y_ = gridPos.y;
-    }
+    coordinateSystem_ = CoordinateSystem::GRID;
+    gridPos_ = gridPos;
+    gridSize_ = {1.0f, 1.0f}; // Text doesn't really have a grid size
+    
+    // Set temporary pixel values (will be updated when added to scene)
+    x_ = gridPos.x;
+    y_ = gridPos.y;
 }
 
 void Text::setText(const std::string& content) { content_ = content; }
@@ -56,6 +49,15 @@ void Text::draw(cairo_t* cr) {
 }
 
 void Text::setSize(float w, float h) {
+}
+
+void Text::updateFromGrid(const Scene* scene) {
+    if (coordinateSystem_ == CoordinateSystem::GRID && scene) {
+        // Convert grid position to pixel position (center-based)
+        auto [pixelX, pixelY] = scene->gridToPixel(gridPos_);
+        x_ = pixelX;
+        y_ = pixelY;
+    }
 }
 
 } // namespace banim

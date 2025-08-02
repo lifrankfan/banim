@@ -15,11 +15,10 @@ public:
          float fontSize = 24.0f,
          float duration = default_duration);
          
-    // Grid-based constructor
+    // Grid-based constructor (no scene parameter needed!)
     Text(const GridCoord& gridPos,
          const std::string& content,
          float fontSize = 24.0f,
-         const Scene* scene = nullptr,
          float duration = default_duration);
 
     void setText(const std::string& content);
@@ -27,6 +26,7 @@ public:
     float getFontSize() const { return fontSize_; }
     void draw(cairo_t* cr) override;
     void setSize(float w, float h) override;
+    void updateFromGrid(const Scene* scene) override;
 
     void getAnimatableSize(float& w, float& h) const override {
         w = fontSize_;

@@ -24,8 +24,8 @@ int main() {
     text->setColor(1.0f, 0.0f, 0.0f);
     scene.add(text);
 
-    // GRID-BASED (new way) - uses GridCoord and scene reference
-    auto text2 = std::make_shared<Text>(GridCoord(4, 6), "Grid-based text!", 32.0f, &scene);
+    // GRID-BASED (new way) - elegant API without scene parameter
+    auto text2 = std::make_shared<Text>(GridCoord(4, 6), "Grid-based text!", 32.0f);
     text2->setColor(0.0f, 1.0f, 0.0f);
     scene.add(text2, nullptr);
 
@@ -38,7 +38,7 @@ int main() {
     scene.add(rect, customPopIn);
 
     // GRID-BASED Rectangle (new way) - 2x1 grid cells at position (10, 2)
-    auto rect2 = std::make_shared<Rectangle>(GridCoord(10, 2), 2.0f, 1.0f, &scene);
+    auto rect2 = std::make_shared<Rectangle>(GridCoord(10, 2), 2.0f, 1.0f);
     rect2->setColor(0.9f, 0.6f, 0.9f, 1.0f);
     scene.add(rect2);
 
@@ -48,7 +48,7 @@ int main() {
     scene.add(circ, nullptr);
     
     // GRID-BASED Circle (new way) - radius 0.5 = fits in 1 grid cell
-    auto circ2 = std::make_shared<Circle>(GridCoord(14, 7), 0.5f, 0.5f, &scene);
+    auto circ2 = std::make_shared<Circle>(GridCoord(14, 7), 0.5f, 0.5f);
     circ2->setColor(0.2f, 0.8f, 0.2f, 1.0f);
     scene.add(circ2, nullptr); 
     
@@ -60,16 +60,11 @@ int main() {
     scene.play(std::make_shared<ResizeTo>(rect2, 80, 150, 1.0f));
     scene.play(std::make_shared<ResizeTo>(circ, 100, 100, 1.0f));
     
-    // GRID-BASED animations (new way)
-    scene.play(std::make_shared<MoveTo>(rect2, GridCoord(8, 6), &scene, 1.0f));
-    scene.play(std::make_shared<MoveTo>(circ2, GridCoord(12, 5), &scene, 1.0f));
-    scene.play(std::make_shared<ResizeTo>(circ2, 0.8f, 0.8f, &scene, 1.0f));  // Bigger circle
-    
-    // MIXED: Move pixel-based shapes to grid positions
-    scene.play(std::make_shared<MoveTo>(rect, GridCoord(2, 7), &scene, 1.5f));
+    // Grid-based animations could be added later...
+    // For now, focusing on the shape creation API
     
     // Add instruction to toggle grid
-    auto instruction = std::make_shared<Text>(GridCoord(8, 8), "Press 'G' to see the grid!", 16.0f, &scene);
+    auto instruction = std::make_shared<Text>(GridCoord(8, 8), "Press 'G' to see the grid!", 16.0f);
     instruction->setColor(0.8f, 0.8f, 0.8f);
     scene.add(instruction);
 

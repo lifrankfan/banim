@@ -9,6 +9,11 @@ namespace banim {
 class Animation;
 class Scene;
 
+enum class CoordinateSystem {
+    PIXEL,
+    GRID
+};
+
 class Shape : public std::enable_shared_from_this<Shape> {
   public:
     virtual ~Shape() = default;
@@ -22,6 +27,9 @@ class Shape : public std::enable_shared_from_this<Shape> {
     virtual void setGridPos(const GridCoord& coord, const Scene* scene);
     virtual void setGridPos(float gridX, float gridY, const Scene* scene);
     virtual GridCoord getGridPos(const Scene* scene) const;
+
+    // Convert coordinates using scene context
+    virtual void updateFromGrid(const Scene* scene) {}
 
     virtual void setAlpha(float alpha) { a_ = alpha; }
     virtual float getAlpha() const { return a_; }
@@ -63,6 +71,11 @@ class Shape : public std::enable_shared_from_this<Shape> {
     float rotation_ = 0;
     float strokeWidth_ = 2.0f;
     bool filled_ = true;
+    
+    // Coordinate system support
+    CoordinateSystem coordinateSystem_ = CoordinateSystem::PIXEL;
+    GridCoord gridPos_{0, 0};
+    std::pair<float, float> gridSize_{1.0f, 1.0f};
 };
 
 class Rectangle : public Shape {
@@ -73,8 +86,8 @@ class Rectangle : public Shape {
               float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f,
               float rotation = 0.0f);
               
-    // Grid-based constructor
-    Rectangle(const GridCoord& gridPos, float gridWidth, float gridHeight, const Scene* scene,
+    // Grid-based constructor (no scene parameter needed!)
+    Rectangle(const GridCoord& gridPos, float gridWidth, float gridHeight,
               float duration = 0.5f,
               float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f,
               float rotation = 0.0f);
@@ -92,6 +105,7 @@ class Rectangle : public Shape {
     float getHeight() const { return h_; }
 
     void draw(cairo_t* cr) override;
+    void updateFromGrid(const Scene* scene) override;
 
     void getAnimatableSize(float& w, float& h) const override {
         w = w_;
@@ -133,8 +147,8 @@ class Circle : public Shape {
            float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f,
            float rotation = 0.0f);
            
-    // Grid-based constructor  
-    Circle(const GridCoord& gridPos, float gridRx, float gridRy, const Scene* scene,
+    // Grid-based constructor (no scene parameter needed!)
+    Circle(const GridCoord& gridPos, float gridRx, float gridRy,
            float duration = 0.5f,
            float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f,
            float rotation = 0.0f);
@@ -149,6 +163,7 @@ class Circle : public Shape {
     float getRy() const { return ry_; }
 
     void draw(cairo_t* cr) override;
+    void updateFromGrid(const Scene* scene) override;
 
     void getAnimatableSize(float& w, float& h) const override {
         w = rx_;

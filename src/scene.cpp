@@ -85,6 +85,9 @@ namespace banim {
     }    
 
     void Scene::add(std::shared_ptr<Shape> shape) {
+        // Convert grid coordinates to pixel coordinates if needed
+        shape->updateFromGrid(this);
+        
         // Create default PopIn animation and queue for timeline
         auto popIn = std::make_shared<PopIn>(shape, 0.5f);
         AddAction action{shape, popIn};
@@ -92,6 +95,9 @@ namespace banim {
     }
 
     void Scene::add(std::shared_ptr<Shape> shape, std::shared_ptr<Animation> animation) {
+        // Convert grid coordinates to pixel coordinates if needed
+        shape->updateFromGrid(this);
+        
         AddAction action{shape, animation};
         timeline_.push(action);
     }
