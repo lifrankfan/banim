@@ -17,7 +17,7 @@ int main() {
     Scene scene(gridConfig);
 
     // Create CPU block
-    auto cpu = std::make_shared<Block>(GridCoord(0, 0), 4.0f, 6.0f, "CPU");
+    auto cpu = std::make_shared<Block>(GridCoord(4, 4), 4.0f, 6.0f, "CPU");
     cpu->setColor(0.2f, 0.4f, 0.8f, 1.0f);
     cpu->setLabelColor(1.0f, 1.0f, 1.0f, 1.0f);
     cpu->setLabelSize(18.0f);
@@ -70,10 +70,10 @@ int main() {
     scene.add(reg);
 
     // Wait a moment before connecting with wires
-    scene.play(std::make_shared<PopIn>(cpu, 1.0f));
-    scene.play(std::make_shared<PopIn>(alu, 1.0f));
-    scene.play(std::make_shared<PopIn>(memory, 1.0f));
-    scene.play(std::make_shared<PopIn>(reg, 1.0f));
+    // scene.play(std::make_shared<PopIn>(cpu, 1.0f));
+    // scene.play(std::make_shared<PopIn>(alu, 1.0f));
+    // scene.play(std::make_shared<PopIn>(memory, 1.0f));
+    // scene.play(std::make_shared<PopIn>(reg, 1.0f));
 
     // Create connections (wires between ports)
     // Get port positions for wire connections
@@ -81,11 +81,11 @@ int main() {
     auto aluInputA = alu->getPort(PortDirection::LEFT, "input_a");
     
     if (cpuDataOut && aluInputA) {
-        // TODO: Update Wire class to use new coordinate system
-        // auto wire1 = std::make_shared<Wire>(cpuDataOut->position, aluInputA->position, &scene, 3.0f);
-        // wire1->setColor(0.9f, 0.9f, 0.2f, 1.0f);
-        // scene.add(wire1);
-        // scene.play(std::make_shared<PopIn>(wire1, 1.0f));
+        // NEW: Auto-routing wire between named ports!
+        auto wire1 = std::make_shared<Wire>(cpu, "data_out", alu, "input_a", 3.0f);
+        wire1->setColor(0.9f, 0.9f, 0.2f, 1.0f);
+        scene.add(wire1);
+        scene.play(std::make_shared<PopIn>(wire1, 1.0f));
     }
 
     // Connect CPU address output to Memory
@@ -93,18 +93,11 @@ int main() {
     auto memAddr = memory->getPort(PortDirection::LEFT, "addr");
     
     if (cpuAddrOut && memAddr) {
-        // Create waypoints for more interesting routing
-        std::vector<GridCoord> waypoints = {
-            cpuAddrOut->position,
-            GridCoord(8, cpuAddrOut->position.y),
-            GridCoord(8, memAddr->position.y),
-            memAddr->position
-        };
-        // TODO: Update Wire class to use new coordinate system
-        // auto wire2 = std::make_shared<Wire>(waypoints, &scene, 2.5f);
-        // wire2->setColor(0.2f, 0.9f, 0.9f, 1.0f);
-        // scene.add(wire2);
-        // scene.play(std::make_shared<PopIn>(wire2, 1.0f));
+        // NEW: Auto-routing wire with elegant API!
+        auto wire2 = std::make_shared<Wire>(cpu, "addr_out", memory, "addr", 2.5f);
+        wire2->setColor(0.2f, 0.9f, 0.9f, 1.0f);
+        scene.add(wire2);
+        scene.play(std::make_shared<PopIn>(wire2, 1.0f));
     }
 
     // Add instruction text
