@@ -1,9 +1,27 @@
 #include "banim/shapes.h"
 #include "banim/animations.h"
+#include "banim/scene.h"
 #include <cmath>
 #include <memory>
 
 namespace banim {
+
+// ────────────── SHAPE BASE CLASS ──────────────
+
+void Shape::setGridPos(const GridCoord& coord, const Scene* scene) {
+    setGridPos(coord.x, coord.y, scene);
+}
+
+void Shape::setGridPos(float gridX, float gridY, const Scene* scene) {
+    if (!scene) return;
+    auto [pixelX, pixelY] = scene->gridToPixel(gridX, gridY);
+    setPos(pixelX, pixelY);
+}
+
+GridCoord Shape::getGridPos(const Scene* scene) const {
+    if (!scene) return {0, 0};
+    return scene->pixelToGrid(x_, y_);
+}
 
 // ────────────── RECTANGLE ──────────────
 
@@ -14,6 +32,28 @@ Rectangle::Rectangle(float x, float y, float width, float height,
     w_ = width; h_ = height;
     r_ = r; g_ = g; b_ = b; a_ = a;
     rotation_ = rotation;
+}
+
+Rectangle::Rectangle(const GridCoord& gridPos, float gridWidth, float gridHeight, const Scene* scene,
+                     float duration, float r, float g, float b, float a, float rotation) 
+    : duration_(duration) {
+    r_ = r; g_ = g; b_ = b; a_ = a;
+    rotation_ = rotation;
+    
+    if (scene) {
+        auto [cellWidth, cellHeight] = scene->getGridCellSize();
+        w_ = gridWidth * cellWidth;
+        h_ = gridHeight * cellHeight;
+        
+        auto [pixelX, pixelY] = scene->gridToPixel(gridPos);
+        x_ = pixelX - w_ / 2.0f;  // Center the rectangle on the grid position
+        y_ = pixelY - h_ / 2.0f;
+    } else {
+        w_ = gridWidth;
+        h_ = gridHeight;
+        x_ = gridPos.x;
+        y_ = gridPos.y;
+    }
 }
 
 Rectangle& Rectangle::setBorderRadius(float radius) {
@@ -29,6 +69,16 @@ void Rectangle::setPos(float x, float y) {
 void Rectangle::setSize(float w, float h) {
     w_ = w;
     h_ = h;
+}
+
+void Rectangle::setGridSize(float gridWidth, float gridHeight, const Scene* scene) {
+    if (!scene) {
+        setSize(gridWidth, gridHeight);
+        return;
+    }
+    
+    auto [cellWidth, cellHeight] = scene->getGridCellSize();
+    setSize(gridWidth * cellWidth, gridHeight * cellHeight);
 }
 
 void Rectangle::draw(cairo_t* cr) {
@@ -70,6 +120,30 @@ Circle::Circle(float cx, float cy, float rx, float ry,
     rotation_ = rotation;
 }
 
+Circle::Circle(const GridCoord& gridPos, float gridRx, float gridRy, const Scene* scene,
+               float duration, float r, float g, float b, float a, float rotation)
+    : duration_(duration) {
+    r_ = r; g_ = g; b_ = b; a_ = a;
+    rotation_ = rotation;
+    
+    if (scene) {
+        auto [cellWidth, cellHeight] = scene->getGridCellSize();
+        // For circles to match grid cell size: gridRx is the radius in grid units
+        // So if gridRx = 0.5, the circle diameter = 1 grid cell
+        rx_ = gridRx * cellWidth;
+        ry_ = gridRy * cellHeight;
+        
+        auto [pixelX, pixelY] = scene->gridToPixel(gridPos);
+        x_ = pixelX;  // Circle center is at the grid position
+        y_ = pixelY;
+    } else {
+        rx_ = gridRx;
+        ry_ = gridRy;
+        x_ = gridPos.x;
+        y_ = gridPos.y;
+    }
+}
+
 void Circle::setPos(float x, float y) {
     x_ = x;
     y_ = y;
@@ -78,6 +152,16 @@ void Circle::setPos(float x, float y) {
 void Circle::setSize(float rx, float ry) {
     rx_ = rx;
     ry_ = ry;
+}
+
+void Circle::setGridSize(float gridRx, float gridRy, const Scene* scene) {
+    if (!scene) {
+        setSize(gridRx, gridRy);
+        return;
+    }
+    
+    auto [cellWidth, cellHeight] = scene->getGridCellSize();
+    setSize(gridRx * cellWidth * 0.5f, gridRy * cellHeight * 0.5f);
 }
 
 void Circle::draw(cairo_t *cr) {

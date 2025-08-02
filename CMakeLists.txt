@@ -35,6 +35,7 @@ add_library(banim STATIC
   src/scene.cpp
   src/animations.cpp
   src/text.cpp
+  src/wires.cpp
 )
 
 # Public includes
@@ -72,11 +73,15 @@ target_link_libraries(banim
 )
 
 # ——————————————————————————————————————————————————————————————
-# Example executable
+# Example executables
 # ——————————————————————————————————————————————————————————————
 add_executable(example examples/example.cpp)
 target_link_libraries(example PRIVATE banim)
 
+add_executable(grid_demo examples/grid_demo.cpp)
+target_link_libraries(grid_demo PRIVATE banim)
+
 # debugging options
 target_compile_options(banim PRIVATE -g -O0)
 target_compile_options(example PRIVATE -g -O0)
+target_compile_options(grid_demo PRIVATE -g -O0)

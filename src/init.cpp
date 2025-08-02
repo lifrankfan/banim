@@ -21,6 +21,7 @@ GLContext *g_ctx = nullptr;
 CairoSurface *g_cairo = nullptr;
 Texture2D *g_tex = nullptr;
 Shader *g_shader = nullptr;
+Scene *g_currentScene = nullptr;  // For keyboard callbacks
 GLuint g_vao = 0, g_vbo = 0;
 
 static const char *kVertShader = R"glsl(
@@ -38,21 +39,24 @@ void main() { gl_FragColor = texture2D(uTex, vUV); }
 GLContext::GLContext(int w, int h, const char *title, bool vsync)
     : w_(w), h_(h) {
     if (!glfwInit())
-        throw std::runtime_error("Failed to init GLFW");
+        throw std::runtime_error("Failed to initialize GLFW");
+
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     win_ = glfwCreateWindow(w_, h_, title, nullptr, nullptr);
     if (!win_) {
         glfwTerminate();
-        throw std::runtime_error("Window creation failed");
+        throw std::runtime_error("Failed to create GLFW window");
     }
     glfwMakeContextCurrent(win_);
     glfwSwapInterval(vsync ? 1 : 0);
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK)
-        throw std::runtime_error("Failed to init GLEW");
+        throw std::runtime_error("Failed to initialize GLEW");
+
     glViewport(0, 0, w_, h_);
     glfwSetFramebufferSizeCallback(win_, framebufferResizeCallback);
+    glfwSetKeyCallback(win_, keyCallback);
 }
 
 GLContext::~GLContext() {
@@ -69,6 +73,16 @@ void GLContext::framebufferResizeCallback(GLFWwindow *, int fw, int fh) {
     glViewport(0, 0, fw, fh);
     g_cairo->recreate(fw, fh);
     g_tex->resize(fw, fh);
+}
+
+void GLContext::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    if (key == GLFW_KEY_G && action == GLFW_PRESS && g_currentScene) {
+        // Toggle grid display with 'G' key
+        g_currentScene->displayGrid(!g_currentScene->isGridDisplayed());
+    }
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
 }
 
 CairoSurface::CairoSurface(int w, int h) { recreate(w, h); }
@@ -214,7 +228,8 @@ bool init(const InitOptions &opt) {
 
 void renderFrame(Scene &scene) {
     cairo_t *cr = g_cairo->context();
-    cairo_set_source_rgb(cr, 1, 1, 1);
+    // Use dark background for better contrast with educational content
+    cairo_set_source_rgb(cr, 0.1, 0.1, 0.15);  // Dark blue-gray background
     cairo_paint(cr);
     scene.renderScene(cr);
     cairo_surface_flush(g_cairo->surface());
@@ -246,6 +261,8 @@ void cleanup() {
 }
 
 void run(Scene& scene, bool fixedTimestep /*= true*/, int fps /*= 60*/) {
+    g_currentScene = &scene;  // Set global scene for keyboard callbacks
+    
     using clock = std::chrono::high_resolution_clock;
     auto last = clock::now();
     double dt = 1.0 / static_cast<double>(fps);
@@ -269,6 +286,8 @@ void run(Scene& scene, bool fixedTimestep /*= true*/, int fps /*= 60*/) {
             std::this_thread::sleep_for(std::chrono::duration<double>(dt));
         }
     }
+    
+    g_currentScene = nullptr;  // Clean up
 }
 
 } // namespace banim

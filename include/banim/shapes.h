@@ -2,10 +2,12 @@
 
 #include <cairo/cairo.h>
 #include <memory>
+#include "banim/grid.h"
 
 namespace banim {
 
 class Animation;
+class Scene;
 
 class Shape : public std::enable_shared_from_this<Shape> {
   public:
@@ -15,6 +17,11 @@ class Shape : public std::enable_shared_from_this<Shape> {
     virtual float y() const { return y_; }
     virtual void setPos(float x, float y) { x_ = x; y_ = y; }
     virtual void setSize(float w, float h) = 0;
+
+    // Grid positioning methods
+    virtual void setGridPos(const GridCoord& coord, const Scene* scene);
+    virtual void setGridPos(float gridX, float gridY, const Scene* scene);
+    virtual GridCoord getGridPos(const Scene* scene) const;
 
     virtual void setAlpha(float alpha) { a_ = alpha; }
     virtual float getAlpha() const { return a_; }
@@ -60,7 +67,14 @@ class Shape : public std::enable_shared_from_this<Shape> {
 
 class Rectangle : public Shape {
   public:
+    // Pixel-based constructor
     Rectangle(float x, float y, float width, float height,
+              float duration = 0.5f,
+              float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f,
+              float rotation = 0.0f);
+              
+    // Grid-based constructor
+    Rectangle(const GridCoord& gridPos, float gridWidth, float gridHeight, const Scene* scene,
               float duration = 0.5f,
               float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f,
               float rotation = 0.0f);
@@ -70,6 +84,9 @@ class Rectangle : public Shape {
 
     void setPos(float x, float y) override;
     void setSize(float w, float h) override;
+    
+    // Grid-based sizing
+    void setGridSize(float gridWidth, float gridHeight, const Scene* scene);
 
     float getWidth() const { return w_; }
     float getHeight() const { return h_; }
@@ -110,13 +127,23 @@ class Rectangle : public Shape {
 
 class Circle : public Shape {
   public:
+    // Pixel-based constructor
     Circle(float cx, float cy, float rx, float ry,
+           float duration = 0.5f,
+           float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f,
+           float rotation = 0.0f);
+           
+    // Grid-based constructor  
+    Circle(const GridCoord& gridPos, float gridRx, float gridRy, const Scene* scene,
            float duration = 0.5f,
            float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f,
            float rotation = 0.0f);
 
     void setPos(float x, float y) override;
     void setSize(float rx, float ry) override;
+    
+    // Grid-based sizing
+    void setGridSize(float gridRx, float gridRy, const Scene* scene);
 
     float getRx() const { return rx_; }
     float getRy() const { return ry_; }

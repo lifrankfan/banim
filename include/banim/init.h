@@ -20,6 +20,7 @@ public:
   ~GLContext();
   GLFWwindow *window() const { return win_; }
   static void framebufferResizeCallback(GLFWwindow *w, int fw, int fh);
+  static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
   int width() const { return w_; }
   int height() const { return h_; }
 
@@ -72,6 +73,7 @@ void cleanup();
 void run(Scene& scene, bool fixedTimestep = true, int fps = 60);
 
 extern GLContext *g_ctx;
+extern Scene *g_currentScene;  // For keyboard callbacks
 
 
 } // namespace banim

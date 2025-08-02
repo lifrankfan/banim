@@ -1,5 +1,6 @@
 #pragma once
 #include "banim/shapes.h"
+#include "banim/grid.h"
 #include <string>
 #include <cairo/cairo.h>
 #include "animations.h"
@@ -8,9 +9,17 @@ namespace banim {
 
 class Text : public Shape {
 public:
+    // Pixel-based constructor
     Text(float x, float y,
          const std::string& content,
          float fontSize = 24.0f,
+         float duration = default_duration);
+         
+    // Grid-based constructor
+    Text(const GridCoord& gridPos,
+         const std::string& content,
+         float fontSize = 24.0f,
+         const Scene* scene = nullptr,
          float duration = default_duration);
 
     void setText(const std::string& content);

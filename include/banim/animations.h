@@ -1,12 +1,15 @@
 #pragma once
 
 #include <memory>
-#include "banim/scene.h"
-#include "banim/shapes.h"
+#include "banim/grid.h"
 
 #define default_duration 0.5f
 
 namespace banim {
+
+class Scene;
+class Shape;
+class Rectangle;
 
 class Animation {
   public:
@@ -31,7 +34,12 @@ class PopIn : public Animation {
 
 class MoveTo : public Animation {
   public:
+    // Pixel-based movement
     MoveTo(std::shared_ptr<Shape> target, float toX, float toY, float duration = default_duration);
+    
+    // Grid-based movement  
+    MoveTo(std::shared_ptr<Shape> target, const GridCoord& toGrid, const Scene* scene, float duration = default_duration);
+    
     bool update(float dt) override;
 
   private:
@@ -45,7 +53,12 @@ class MoveTo : public Animation {
 
 class ResizeTo : public Animation {
   public:
+    // Pixel-based resizing
     ResizeTo(std::shared_ptr<Shape> shape, float targetW, float targetH, float duration = default_duration);
+    
+    // Grid-based resizing
+    ResizeTo(std::shared_ptr<Shape> shape, float gridW, float gridH, const Scene* scene, float duration = default_duration);
+    
     bool update(float dt) override;
 
   private:

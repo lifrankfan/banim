@@ -1,6 +1,7 @@
 #include "banim/animations.h"
 #include <banim/shapes.h>
 #include <banim/text.h>
+#include <banim/scene.h>
 #include <cmath>
 #include <algorithm>
 
@@ -34,6 +35,29 @@ bool PopIn::update(float dt) {
 MoveTo::MoveTo(std::shared_ptr<Shape> target, float toX, float toY, float duration)
     : target_(target), toX_(toX), toY_(toY), duration_(duration) {}
 
+MoveTo::MoveTo(std::shared_ptr<Shape> target, const GridCoord& toGrid, const Scene* scene, float duration)
+    : target_(target), duration_(duration) {
+    if (scene) {
+        auto [pixelX, pixelY] = scene->gridToPixel(toGrid);
+        
+        // Check if this is a Rectangle and adjust for centering
+        auto rect = std::dynamic_pointer_cast<Rectangle>(target);
+        if (rect) {
+            // For rectangles, we need to account for the fact that grid position is the center
+            // but setPos sets the top-left corner
+            toX_ = pixelX - rect->getWidth() / 2.0f;
+            toY_ = pixelY - rect->getHeight() / 2.0f;
+        } else {
+            // For circles and other shapes, use the center directly
+            toX_ = pixelX;
+            toY_ = pixelY;
+        }
+    } else {
+        toX_ = toGrid.x;
+        toY_ = toGrid.y;
+    }
+}
+
 bool MoveTo::update(float dt) {
     if (!initialized_) {
         fromX_ = target_->x();
@@ -54,6 +78,18 @@ bool MoveTo::update(float dt) {
 
 ResizeTo::ResizeTo(std::shared_ptr<Shape> shape, float targetW, float targetH, float duration)
     : shape_(shape), targetW_(targetW), targetH_(targetH), duration_(duration) {}
+
+ResizeTo::ResizeTo(std::shared_ptr<Shape> shape, float gridW, float gridH, const Scene* scene, float duration)
+    : shape_(shape), duration_(duration) {
+    if (scene) {
+        auto [cellWidth, cellHeight] = scene->getGridCellSize();
+        targetW_ = gridW * cellWidth;
+        targetH_ = gridH * cellHeight;
+    } else {
+        targetW_ = gridW;
+        targetH_ = gridH;
+    }
+}
 
 bool ResizeTo::update(float dt) {
     if (!initialized_) {
