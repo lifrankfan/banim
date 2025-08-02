@@ -1,59 +1,44 @@
 # banim
 
-Wayland users will need to install glfw-wayland
+## dependencies
+```
+sudo pacman -S cmake make gcc pkgconf glfw glew cairo mesa zip unzip tar curl ninja
+```
 
-Add VCPKG_ROOT to .bashrc and source:
+clone vcpkg
+```
+cd ~ && git clone https://github.com/Microsoft/vcpkg.git
+```
 
-export VCPKG_ROOT=$HOME/vcpkg
+bootstrap vcpkg
+```
+cd ~/vcpkg && ./bootstrap-vcpkg.sh
+```
 
-Create build directory:
-mkdir build && cd build
+add VCPKG_ROOT environment variable to bashrc and source
+``` 
+echo 'export VCPKG_ROOT=$HOME/vcpkg' >> ~/.bashrc && source ~/.bashrc
+```
 
-Run CMakeLists.txt
+verify vcpkg is set
+```
+export VCPKG_ROOT=$HOME/vcpkg && echo $VCPKG_ROOT
+```
 
-cmake .. \
-  -G "Unix Makefiles" \
-  -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
+make build directory
+```
+cd /home/lifrankfan/Projects/banim && mkdir -p build && cd build
+```
 
-Run Make
-Make
+configure rpoject with cmake using vcpkg toolchain
+```
+export VCPKG_ROOT=$HOME/vcpkg && cmake .. -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
+```
+
+make the project
+```
+make
+```
 
 Run project
 ./project_name
-
-+-----------------------+       +------------------------+
-|    Your Shapes        |       |      Scene             |
-| (Rectangle, Circle)   |       | - List of shapes       |
-+-----------------------+       | - render()             |
-          |                     +------------------------+
-          |                             |
-          v                             v
-+-----------------------+       +------------------------+
-|   CairoSurface (CPU)  |<------+  shape->draw(cr)       |
-|  - 2D drawing buffer  |                             |
-+-----------------------+                             |
-          | Cairo renders                             |
-          v                                           |
-+-----------------------+                             |
-|  Texture2D (GPU)      |<-----------------------------+
-|  - Gets uploaded with Cairo pixels                  |
-+-----------------------+
-          |
-          v
-+-----------------------+
-|     Shader (GPU)      |
-| - Vertex: puts quad on screen |
-| - Fragment: samples texture   |
-+-----------------------+
-          |
-          v
-+-----------------------+
-|  OpenGL draws quad    |
-| with Cairo image      |
-+-----------------------+
-          |
-          v
-+-----------------------+
-|   GLFW window         |
-| (GLContext)           |
-+-----------------------+
