@@ -31,12 +31,9 @@ find_package(OpenGL REQUIRED)
 # ——————————————————————————————————————————————————————————————
 add_library(banim STATIC
   src/init.cpp
-  src/shapes.cpp
+  src/animatable.cpp
   src/scene.cpp
   src/animations.cpp
-  src/text.cpp
-  src/wires.cpp
-  src/block.cpp
 )
 
 # Public includes

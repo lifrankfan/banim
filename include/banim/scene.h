@@ -9,11 +9,11 @@
 
 namespace banim {
 
-class Shape;
+class Animatable;
 class Animation;
 
 struct AddAction {
-    std::shared_ptr<Shape> shape;
+    std::shared_ptr<Animatable> animatable;
     std::shared_ptr<Animation> spawnAnimation; // nullptr for no animation
 };
 
@@ -27,15 +27,9 @@ struct GridConfig {
     float lineWidth = 1.0f; // Grid line width
     float r = 0.8f, g = 0.8f, b = 0.8f, a = 0.3f; // Grid line color
     
-    // Fixed reference size for consistent grid scaling
-    float referenceWidth = 800.0f;
-    float referenceHeight = 600.0f;
-    
     GridConfig() = default;
     GridConfig(int cols, int rows, bool display = false) 
         : cols(cols), rows(rows), displayGrid(display) {}
-    GridConfig(int cols, int rows, float refWidth, float refHeight, bool display = false)
-        : cols(cols), rows(rows), referenceWidth(refWidth), referenceHeight(refHeight), displayGrid(display) {}
 };
 
 class Scene {
@@ -49,19 +43,16 @@ class Scene {
     void displayGrid(bool show) { gridConfig_.displayGrid = show; }
     bool isGridDisplayed() const { return gridConfig_.displayGrid; }
     
-    // Convert grid coordinates to pixel coordinates
+    // Convert grid coordinates to pixel coordinates (for rendering)
     std::pair<float, float> gridToPixel(const GridCoord& coord) const;
     std::pair<float, float> gridToPixel(float gridX, float gridY) const;
-    
-    // Convert pixel coordinates to grid coordinates
-    GridCoord pixelToGrid(float pixelX, float pixelY) const;
     
     // Get grid cell size in pixels
     std::pair<float, float> getGridCellSize() const;
     
-    // Existing methods
-    void add(std::shared_ptr<Shape> shape);
-    void add(std::shared_ptr<Shape> shape, std::shared_ptr<Animation> animation);
+    // Add animatable objects
+    void add(std::shared_ptr<Animatable> animatable);
+    void add(std::shared_ptr<Animatable> animatable, std::shared_ptr<Animation> animation);
     
     void play(std::shared_ptr<Animation> anim);
     void renderScene(cairo_t *cr);
@@ -69,13 +60,12 @@ class Scene {
     void wait(float duration);
 
   private:
-    std::vector<std::shared_ptr<Shape>> shapes_;
+    std::vector<std::shared_ptr<Animatable>> animatables_;
     std::queue<TimelineAction> timeline_;
     std::shared_ptr<Animation> currentAnimation_ = nullptr;
     GridConfig gridConfig_;
     
     void drawGrid(cairo_t *cr) const;
 };
-
 
 } // namespace banim

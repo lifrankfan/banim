@@ -1,5 +1,5 @@
 #include "banim/scene.h"
-#include "banim/shapes.h"
+#include "banim/animatable.h"
 #include "banim/animations.h"
 #include "banim/init.h"
 #include <algorithm>
@@ -12,9 +12,13 @@ namespace banim {
     }
     
     std::pair<float, float> Scene::gridToPixel(float gridX, float gridY) const {
-        // Use fixed reference size for consistent grid scaling
-        float cellWidth = gridConfig_.referenceWidth / gridConfig_.cols;
-        float cellHeight = gridConfig_.referenceHeight / gridConfig_.rows;
+        if (!g_ctx) return {0, 0};
+        
+        float windowWidth = static_cast<float>(g_ctx->width());
+        float windowHeight = static_cast<float>(g_ctx->height());
+        
+        float cellWidth = windowWidth / gridConfig_.cols;
+        float cellHeight = windowHeight / gridConfig_.rows;
         
         // Grid coordinates are centered in cells
         float pixelX = (gridX + 0.5f) * cellWidth;
@@ -23,21 +27,13 @@ namespace banim {
         return {pixelX, pixelY};
     }
     
-    GridCoord Scene::pixelToGrid(float pixelX, float pixelY) const {
-        // Use fixed reference size for consistent grid scaling
-        float cellWidth = gridConfig_.referenceWidth / gridConfig_.cols;
-        float cellHeight = gridConfig_.referenceHeight / gridConfig_.rows;
-        
-        float gridX = (pixelX / cellWidth) - 0.5f;
-        float gridY = (pixelY / cellHeight) - 0.5f;
-        
-        return {gridX, gridY};
-    }
-    
     std::pair<float, float> Scene::getGridCellSize() const {
-        // Use fixed reference size for consistent grid scaling
-        return {gridConfig_.referenceWidth / gridConfig_.cols, 
-                gridConfig_.referenceHeight / gridConfig_.rows};
+        if (!g_ctx) return {50, 50}; // Default fallback
+        
+        float windowWidth = static_cast<float>(g_ctx->width());
+        float windowHeight = static_cast<float>(g_ctx->height());
+        
+        return {windowWidth / gridConfig_.cols, windowHeight / gridConfig_.rows};
     }
     
     void Scene::drawGrid(cairo_t *cr) const {
@@ -46,12 +42,8 @@ namespace banim {
         float windowWidth = static_cast<float>(g_ctx->width());
         float windowHeight = static_cast<float>(g_ctx->height());
         
-        // Calculate scaling factors to fit the reference grid to current window
-        float scaleX = windowWidth / gridConfig_.referenceWidth;
-        float scaleY = windowHeight / gridConfig_.referenceHeight;
-        
-        float cellWidth = (gridConfig_.referenceWidth / gridConfig_.cols) * scaleX;
-        float cellHeight = (gridConfig_.referenceHeight / gridConfig_.rows) * scaleY;
+        float cellWidth = windowWidth / gridConfig_.cols;
+        float cellHeight = windowHeight / gridConfig_.rows;
         
         cairo_save(cr);
         cairo_set_source_rgba(cr, gridConfig_.r, gridConfig_.g, gridConfig_.b, gridConfig_.a);
@@ -84,21 +76,15 @@ namespace banim {
         timeline_.push(std::make_shared<Wait>(duration));
     }    
 
-    void Scene::add(std::shared_ptr<Shape> shape) {
-        // Convert grid coordinates to pixel coordinates if needed
-        shape->updateFromGrid(this);
-        
+    void Scene::add(std::shared_ptr<Animatable> animatable) {
         // Create default PopIn animation and queue for timeline
-        auto popIn = std::make_shared<PopIn>(shape, 0.5f);
-        AddAction action{shape, popIn};
+        auto popIn = std::make_shared<PopIn>(animatable, 0.5f);
+        AddAction action{animatable, popIn};
         timeline_.push(action);
     }
 
-    void Scene::add(std::shared_ptr<Shape> shape, std::shared_ptr<Animation> animation) {
-        // Convert grid coordinates to pixel coordinates if needed
-        shape->updateFromGrid(this);
-        
-        AddAction action{shape, animation};
+    void Scene::add(std::shared_ptr<Animatable> animatable, std::shared_ptr<Animation> animation) {
+        AddAction action{animatable, animation};
         timeline_.push(action);
     }
 
@@ -106,24 +92,10 @@ namespace banim {
         // Draw grid first (behind everything)
         drawGrid(cr);
         
-        if (!g_ctx) return;
-        
-        // Calculate scaling factors to scale shapes from reference size to current window
-        float windowWidth = static_cast<float>(g_ctx->width());
-        float windowHeight = static_cast<float>(g_ctx->height());
-        float scaleX = windowWidth / gridConfig_.referenceWidth;
-        float scaleY = windowHeight / gridConfig_.referenceHeight;
-        
-        cairo_save(cr);
-        // Apply scaling transformation to make shapes scale with window
-        cairo_scale(cr, scaleX, scaleY);
-        
-        // Draw all shapes (they will be automatically scaled)
-        for (auto &shape : shapes_) {
-            shape->draw(cr);
+        // Draw all animatable objects
+        for (auto &animatable : animatables_) {
+            animatable->draw(cr);
         }
-        
-        cairo_restore(cr);
     }
 
     void Scene::update(float dt) {
@@ -132,23 +104,23 @@ namespace banim {
             auto action = timeline_.front();
             timeline_.pop();
             
-            // Check if this is an animation or a shape addition
+            // Check if this is an animation or an animatable addition
             if (std::holds_alternative<std::shared_ptr<Animation>>(action)) {
                 // It's an animation
                 currentAnimation_ = std::get<std::shared_ptr<Animation>>(action);
             } else {
-                // It's a shape addition
+                // It's an animatable addition
                 auto addAction = std::get<AddAction>(action);
                 
-                // Add shape to the scene
-                shapes_.push_back(addAction.shape);
+                // Add animatable to the scene
+                animatables_.push_back(addAction.animatable);
                 
                 // If there's a spawn animation, start it
                 if (addAction.spawnAnimation) {
-                    addAction.shape->hide(); // Hide initially
+                    addAction.animatable->hide(); // Hide initially
                     currentAnimation_ = addAction.spawnAnimation;
                 }
-                // If no spawn animation, shape is immediately visible
+                // If no spawn animation, animatable is immediately visible
             }
         }
 
