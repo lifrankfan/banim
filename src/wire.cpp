@@ -6,11 +6,11 @@
 
 namespace banim {
 
-// Simple API: Connect two blocks by port names
-Wire::Wire(std::shared_ptr<Block> fromBlock, const std::string& fromPortName,
-           std::shared_ptr<Block> toBlock, const std::string& toPortName)
+// Simple API: Connect two port providers by port names
+Wire::Wire(std::shared_ptr<IPortProvider> fromProvider, const std::string& fromPortName,
+           std::shared_ptr<IPortProvider> toProvider, const std::string& toPortName)
     : Line(GridCoord(0, 0), GridCoord(1, 1)), // Temporary coordinates, will be updated
-      fromBlock_(fromBlock), toBlock_(toBlock),
+      fromProvider_(fromProvider), toProvider_(toProvider),
       fromPortName_(fromPortName), toPortName_(toPortName),
       usePortNames_(true), fromPortIndex_(0), toPortIndex_(0), autoRoute_(false) {
     
@@ -18,18 +18,18 @@ Wire::Wire(std::shared_ptr<Block> fromBlock, const std::string& fromPortName,
     setColor(0.2f, 0.6f, 1.0f, 1.0f); // Blue wire
     setStrokeWidth(2.0f);
     
-    // Store initial block positions
-    lastFromBlockPos_ = fromBlock_->getGridPos();
-    lastToBlockPos_ = toBlock_->getGridPos();
+    // Store initial provider positions
+    lastFromProviderPos_ = fromProvider_->getGridPos();
+    lastToProviderPos_ = toProvider_->getGridPos();
     
     updateRouting();
 }
 
-// Simple API: Connect two blocks by port direction and index
-Wire::Wire(std::shared_ptr<Block> fromBlock, PortDirection fromDirection, int fromPortIndex,
-           std::shared_ptr<Block> toBlock, PortDirection toDirection, int toPortIndex)
+// Simple API: Connect two port providers by port direction and index
+Wire::Wire(std::shared_ptr<IPortProvider> fromProvider, PortDirection fromDirection, int fromPortIndex,
+           std::shared_ptr<IPortProvider> toProvider, PortDirection toDirection, int toPortIndex)
     : Line(GridCoord(0, 0), GridCoord(1, 1)), // Temporary coordinates, will be updated
-      fromBlock_(fromBlock), toBlock_(toBlock),
+      fromProvider_(fromProvider), toProvider_(toProvider),
       fromDirection_(fromDirection), toDirection_(toDirection),
       fromPortIndex_(fromPortIndex), toPortIndex_(toPortIndex),
       usePortNames_(false), autoRoute_(false) {
@@ -38,15 +38,15 @@ Wire::Wire(std::shared_ptr<Block> fromBlock, PortDirection fromDirection, int fr
     setColor(0.2f, 0.6f, 1.0f, 1.0f); // Blue wire
     setStrokeWidth(2.0f);
     
-    // Store initial block positions
-    lastFromBlockPos_ = fromBlock_->getGridPos();
-    lastToBlockPos_ = toBlock_->getGridPos();
+    // Store initial provider positions
+    lastFromProviderPos_ = fromProvider_->getGridPos();
+    lastToProviderPos_ = toProvider_->getGridPos();
     
     updateRouting();
 }
 
 void Wire::updateRouting() {
-    if (!fromBlock_ || !toBlock_) return;
+    if (!fromProvider_ || !toProvider_) return;
     
     // Always update endpoints to track port positions
     Port* fromPort = getFromPort();
@@ -65,8 +65,8 @@ void Wire::updateRouting() {
     // If autoRoute is false, preserve existing waypoints but update endpoints
     
     // Update stored positions
-    lastFromBlockPos_ = fromBlock_->getGridPos();
-    lastToBlockPos_ = toBlock_->getGridPos();
+    lastFromProviderPos_ = fromProvider_->getGridPos();
+    lastToProviderPos_ = toProvider_->getGridPos();
 }
 
 void Wire::draw(cairo_t* cr) {
@@ -120,13 +120,13 @@ void Wire::draw(cairo_t* cr) {
 }
 
 bool Wire::needsRoutingUpdate() {
-    if (!fromBlock_ || !toBlock_) return false;
+    if (!fromProvider_ || !toProvider_) return false;
     
-    // Always check for block movement to update endpoints
-    return (lastFromBlockPos_.x != fromBlock_->getGridPos().x ||
-            lastFromBlockPos_.y != fromBlock_->getGridPos().y ||
-            lastToBlockPos_.x != toBlock_->getGridPos().x ||
-            lastToBlockPos_.y != toBlock_->getGridPos().y);
+    // Check if blocks have moved
+    return (lastFromProviderPos_.x != fromProvider_->getGridPos().x ||
+            lastFromProviderPos_.y != fromProvider_->getGridPos().y ||
+            lastToProviderPos_.x != toProvider_->getGridPos().x ||
+            lastToProviderPos_.y != toProvider_->getGridPos().y);
 }
 
 void Wire::calculateAutoRoute() {
@@ -134,14 +134,14 @@ void Wire::calculateAutoRoute() {
     Port* toPort = getToPort();
     
     if (!fromPort || !toPort) {
-        // Fallback: connect block centers
-        GridCoord fromCenter = fromBlock_->getGridPos();
-        fromCenter.x += fromBlock_->getGridWidth() * 0.5f;
-        fromCenter.y += fromBlock_->getGridHeight() * 0.5f;
+        // Fallback: connect provider centers
+        GridCoord fromCenter = fromProvider_->getGridPos();
+        fromCenter.x += fromProvider_->getGridWidth() * 0.5f;
+        fromCenter.y += fromProvider_->getGridHeight() * 0.5f;
         
-        GridCoord toCenter = toBlock_->getGridPos();
-        toCenter.x += toBlock_->getGridWidth() * 0.5f;
-        toCenter.y += toBlock_->getGridHeight() * 0.5f;
+        GridCoord toCenter = toProvider_->getGridPos();
+        toCenter.x += toProvider_->getGridWidth() * 0.5f;
+        toCenter.y += toProvider_->getGridHeight() * 0.5f;
         
         // Update line endpoints
         setGridPos(fromCenter);
@@ -256,33 +256,33 @@ std::vector<GridCoord> Wire::generatePathBetweenPorts(const Port* fromPort, cons
 }
 
 Port* Wire::getFromPort() {
-    if (!fromBlock_) return nullptr;
+    if (!fromProvider_) return nullptr;
     
     if (usePortNames_) {
         // Search all directions for the named port
         for (auto dir : {PortDirection::LEFT, PortDirection::RIGHT, PortDirection::TOP, PortDirection::BOTTOM}) {
-            if (auto* port = fromBlock_->getPort(dir, fromPortName_)) {
+            if (auto* port = fromProvider_->getPort(dir, fromPortName_)) {
                 return port;
             }
         }
     } else {
-        return fromBlock_->getPort(fromDirection_, fromPortIndex_);
+        return fromProvider_->getPort(fromDirection_, fromPortIndex_);
     }
     return nullptr;
 }
 
 Port* Wire::getToPort() {
-    if (!toBlock_) return nullptr;
+    if (!toProvider_) return nullptr;
     
     if (usePortNames_) {
         // Search all directions for the named port
         for (auto dir : {PortDirection::LEFT, PortDirection::RIGHT, PortDirection::TOP, PortDirection::BOTTOM}) {
-            if (auto* port = toBlock_->getPort(dir, toPortName_)) {
+            if (auto* port = toProvider_->getPort(dir, toPortName_)) {
                 return port;
             }
         }
     } else {
-        return toBlock_->getPort(toDirection_, toPortIndex_);
+        return toProvider_->getPort(toDirection_, toPortIndex_);
     }
     return nullptr;
 }

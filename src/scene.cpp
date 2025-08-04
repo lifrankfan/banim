@@ -84,6 +84,12 @@ namespace banim {
         animatables_.push_back(animatable);
     }
     
+    void Scene::clear() {
+        // Queue a clear action in the timeline instead of clearing immediately
+        ClearAction clearAction;
+        timeline_.push(clearAction);
+    }
+    
     void Scene::wait(float duration) {
         timeline_.push(std::make_shared<Wait>(duration));
     }    
@@ -116,7 +122,7 @@ namespace banim {
             auto action = timeline_.front();
             timeline_.pop();
             
-            // Check if this is an animation or an animatable addition
+            // Check if this is an animation, animatable addition, or clear action
             if (std::holds_alternative<std::shared_ptr<Animation>>(action)) {
                 // It's an animation
                 currentAnimation_ = std::get<std::shared_ptr<Animation>>(action);
@@ -132,7 +138,7 @@ namespace banim {
                 if (animGroup) {
                     animGroup->setScene(this);
                 }
-            } else {
+            } else if (std::holds_alternative<AddAction>(action)) {
                 // It's an animatable addition
                 auto addAction = std::get<AddAction>(action);
                 
@@ -145,6 +151,9 @@ namespace banim {
                     currentAnimation_ = addAction.spawnAnimation;
                 }
                 // If no spawn animation, animatable is immediately visible
+            } else if (std::holds_alternative<ClearAction>(action)) {
+                // It's a clear action - clear all animatables
+                animatables_.clear();
             }
         }
 

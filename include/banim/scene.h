@@ -19,7 +19,11 @@ struct AddAction {
     std::shared_ptr<Animation> spawnAnimation; // nullptr for no animation
 };
 
-using TimelineAction = std::variant<std::shared_ptr<Animation>, AddAction>;
+struct ClearAction {
+    // Empty struct to represent a clear action
+};
+
+using TimelineAction = std::variant<std::shared_ptr<Animation>, AddAction, ClearAction>;
 
 // Grid configuration for a scene
 struct GridConfig {
@@ -55,6 +59,9 @@ class Scene {
     // Add animatable objects
     void add(std::shared_ptr<Animatable> animatable);
     void add(std::shared_ptr<Animatable> animatable, std::shared_ptr<Animation> animation);
+    
+    // Clear all animatable objects from the scene
+    void clear();
     
     // Animation playback
     void play(std::shared_ptr<Animation> anim);

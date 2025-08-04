@@ -1,7 +1,6 @@
 #include "banim/block.h"
 #include "banim/scene.h"
 #include "banim/init.h"
-#include <cairo.h>
 #include <algorithm>
 #include <cmath>
 

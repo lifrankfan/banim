@@ -36,6 +36,7 @@ add_library(banim STATIC
   src/animations.cpp
   src/block.cpp
   src/wire.cpp
+  src/logic_gates.cpp
 )
 
 # Public includes
@@ -78,6 +79,9 @@ target_link_libraries(banim
 
 add_executable(demo examples/demo.cpp)
 target_link_libraries(demo PRIVATE banim)
+
+add_executable(logic_gates_demo examples/logic_gates_demo.cpp)
+target_link_libraries(logic_gates_demo PRIVATE banim)
 
 # debugging options
 target_compile_options(banim PRIVATE -g -O0)
