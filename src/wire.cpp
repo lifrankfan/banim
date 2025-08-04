@@ -12,7 +12,7 @@ Wire::Wire(std::shared_ptr<Block> fromBlock, const std::string& fromPortName,
     : Line(GridCoord(0, 0), GridCoord(1, 1)), // Temporary coordinates, will be updated
       fromBlock_(fromBlock), toBlock_(toBlock),
       fromPortName_(fromPortName), toPortName_(toPortName),
-      usePortNames_(true), fromPortIndex_(0), toPortIndex_(0), autoRoute_(true) {
+      usePortNames_(true), fromPortIndex_(0), toPortIndex_(0), autoRoute_(false) {
     
     // Set wire appearance
     setColor(0.2f, 0.6f, 1.0f, 1.0f); // Blue wire
@@ -32,7 +32,7 @@ Wire::Wire(std::shared_ptr<Block> fromBlock, PortDirection fromDirection, int fr
       fromBlock_(fromBlock), toBlock_(toBlock),
       fromDirection_(fromDirection), toDirection_(toDirection),
       fromPortIndex_(fromPortIndex), toPortIndex_(toPortIndex),
-      usePortNames_(false), autoRoute_(true) {
+      usePortNames_(false), autoRoute_(false) {
     
     // Set wire appearance
     setColor(0.2f, 0.6f, 1.0f, 1.0f); // Blue wire
@@ -46,9 +46,23 @@ Wire::Wire(std::shared_ptr<Block> fromBlock, PortDirection fromDirection, int fr
 }
 
 void Wire::updateRouting() {
-    if (!autoRoute_ || !fromBlock_ || !toBlock_) return;
+    if (!fromBlock_ || !toBlock_) return;
     
-    calculateAutoRoute();
+    // Always update endpoints to track port positions
+    Port* fromPort = getFromPort();
+    Port* toPort = getToPort();
+    
+    if (fromPort && toPort) {
+        // Update start and end positions to follow ports
+        setGridPos(fromPort->position);
+        setEndPos(toPort->position);
+    }
+    
+    // Only auto-generate waypoints if autoRoute is enabled
+    if (autoRoute_) {
+        calculateAutoRoute();
+    }
+    // If autoRoute is false, preserve existing waypoints but update endpoints
     
     // Update stored positions
     lastFromBlockPos_ = fromBlock_->getGridPos();
@@ -106,8 +120,9 @@ void Wire::draw(cairo_t* cr) {
 }
 
 bool Wire::needsRoutingUpdate() {
-    if (!autoRoute_ || !fromBlock_ || !toBlock_) return false;
+    if (!fromBlock_ || !toBlock_) return false;
     
+    // Always check for block movement to update endpoints
     return (lastFromBlockPos_.x != fromBlock_->getGridPos().x ||
             lastFromBlockPos_.y != fromBlock_->getGridPos().y ||
             lastToBlockPos_.x != toBlock_->getGridPos().x ||

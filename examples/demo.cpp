@@ -27,20 +27,23 @@ int main() {
     
     auto wire = std::make_shared<Wire>(blockA, "output", blockB, "input");
     wire->setColor(1.0f, 0.0f, 0.0f, 1.0f);  // Red wire
-    
+
     // Add to scene
     scene.add(blockA);
     scene.add(blockB);
     scene.add(wire);
     
-    // Simple animation
-    // scene.play(std::make_shared<PopIn>(blockA, 1.0f));
-    // scene.wait(0.5f);
-    // scene.play(std::make_shared<PopIn>(blockB, 1.0f));
-    scene.play(std::make_shared<MoveTo>(blockA, GridCoord(4, 4)));
+    // Move Block A - wire endpoints will automatically follow the ports
+    scene.play(std::make_shared<MoveTo>(blockA, GridCoord(4, 4), 2.0f));
     scene.wait(0.5f);
-    scene.play(std::make_shared<PopIn>(wire, 1.0f));
     
+    scene.play(std::make_shared<AddWaypoint>(wire, GridCoord(7, 4.5), 0.0f)); // Move the waypoint we just added
+    scene.play(std::make_shared<AddWaypoint>(wire, GridCoord(7, 3.5), 0.0f)); // Move the waypoint we just added
+    scene.play(std::make_shared<AddWaypoint>(wire, GridCoord(4, 3.5), 0.0f)); // Move the waypoint we just added
+    scene.play(std::make_shared<AddWaypoint>(wire, GridCoord(4, 2.5), 0.0f));
+    scene.wait(0.5f);
+
+
     // Run the scene
     run(scene);
     
