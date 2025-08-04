@@ -72,6 +72,14 @@ namespace banim {
         timeline_.push(anim);
     }
     
+    void Scene::playGroup(const std::vector<std::shared_ptr<Animation>>& animations) {
+        if (animations.empty()) return;
+        
+        auto group = std::make_shared<AnimationGroup>();
+        group->addAll(animations);
+        timeline_.push(group);
+    }
+    
     void Scene::wait(float duration) {
         timeline_.push(std::make_shared<Wait>(duration));
     }    

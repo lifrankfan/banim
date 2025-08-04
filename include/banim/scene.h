@@ -11,6 +11,7 @@ namespace banim {
 
 class Animatable;
 class Animation;
+class AnimationGroup;
 
 struct AddAction {
     std::shared_ptr<Animatable> animatable;
@@ -54,7 +55,18 @@ class Scene {
     void add(std::shared_ptr<Animatable> animatable);
     void add(std::shared_ptr<Animatable> animatable, std::shared_ptr<Animation> animation);
     
+    // Animation playback
     void play(std::shared_ptr<Animation> anim);
+    
+    // Animation groups - play animations in parallel
+    void playGroup(const std::vector<std::shared_ptr<Animation>>& animations);
+    
+    // Convenience method for playing multiple animations in parallel
+    template<typename... Args>
+    void playGroup(Args&&... animations) {
+        playGroup({std::forward<Args>(animations)...});
+    }
+    
     void renderScene(cairo_t *cr);
     void update(float dt);
     void wait(float duration);

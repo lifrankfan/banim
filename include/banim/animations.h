@@ -192,4 +192,23 @@ class MoveLineStart : public Animation {
     bool initialized_ = false;
 };
 
+// Animation group for parallel execution
+class AnimationGroup : public Animation {
+  public:
+    AnimationGroup() = default;
+    
+    // Add animations to the group
+    void add(std::shared_ptr<Animation> animation);
+    void addAll(const std::vector<std::shared_ptr<Animation>>& animations);
+    
+    bool update(float dt) override;
+    
+    // Check if the group is empty
+    bool empty() const { return animations_.empty(); }
+    size_t size() const { return animations_.size(); }
+
+  private:
+    std::vector<std::shared_ptr<Animation>> animations_;
+};
+
 } // namespace banim

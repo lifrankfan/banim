@@ -321,5 +321,38 @@ bool AddWaypoint::update(float dt) {
     return t < 1.0f;
 }
 
+// AnimationGroup implementation
+void AnimationGroup::add(std::shared_ptr<Animation> animation) {
+    if (animation) {
+        animations_.push_back(animation);
+    }
+}
+
+void AnimationGroup::addAll(const std::vector<std::shared_ptr<Animation>>& animations) {
+    for (auto& anim : animations) {
+        if (anim) {
+            animations_.push_back(anim);
+        }
+    }
+}
+
+bool AnimationGroup::update(float dt) {
+    if (animations_.empty()) {
+        return false; // No animations to update
+    }
+    
+    // Update all animations and remove finished ones
+    animations_.erase(
+        std::remove_if(animations_.begin(), animations_.end(),
+            [dt](std::shared_ptr<Animation>& anim) {
+                return !anim->update(dt); // Remove if animation is finished
+            }),
+        animations_.end()
+    );
+    
+    // Return true if there are still animations running
+    return !animations_.empty();
+}
+
 
 } // namespace banim
