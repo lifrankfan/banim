@@ -11,6 +11,7 @@ namespace banim {
 PopIn::PopIn(std::shared_ptr<Animatable> animatable, float duration)
     : animatable_(animatable), duration_(duration) {
     animatable_->getAnimatableSize(targetW_, targetH_);
+    targetAlpha_ = animatable_->getAlpha(); // Store the current alpha as target
     animatable_->resetForAnimation();
 }
 
@@ -22,11 +23,13 @@ bool PopIn::update(float dt) {
     float scale = t;  // linear
 
     if (!started_) {
-        animatable_->show();
+        animatable_->setAlpha(0.0f); // Start from fully transparent
         started_ = true;
     }
 
+    // Animate both size and alpha
     animatable_->setAnimatableSize(targetW_ * scale, targetH_ * scale);
+    animatable_->setAlpha(targetAlpha_ * scale); // Animate to target alpha
 
     return t < 1.0f;
 }
@@ -321,6 +324,38 @@ bool AddWaypoint::update(float dt) {
     return t < 1.0f;
 }
 
+// AddToScene implementation
+AddToScene::AddToScene(std::shared_ptr<Animatable> animatable, std::shared_ptr<Animation> spawnAnimation)
+    : animatable_(animatable), spawnAnimation_(spawnAnimation) {
+}
+
+bool AddToScene::update(float dt) {
+    if (!scene_ || !animatable_) {
+        return false; // Invalid state
+    }
+    
+    if (!added_) {
+        // Add the animatable to the scene
+        scene_->addAnimatable(animatable_);
+        added_ = true;
+        
+        // If there's a spawn animation, start it
+        if (spawnAnimation_) {
+            animatable_->hide(); // Hide initially for spawn animation
+            return true; // Continue to run spawn animation
+        } else {
+            return false; // No spawn animation, we're done
+        }
+    }
+    
+    // Update spawn animation if it exists
+    if (spawnAnimation_) {
+        return spawnAnimation_->update(dt);
+    }
+    
+    return false;
+}
+
 // AnimationGroup implementation
 void AnimationGroup::add(std::shared_ptr<Animation> animation) {
     if (animation) {
@@ -332,6 +367,16 @@ void AnimationGroup::addAll(const std::vector<std::shared_ptr<Animation>>& anima
     for (auto& anim : animations) {
         if (anim) {
             animations_.push_back(anim);
+        }
+    }
+}
+
+// Method to set scene for all AddToScene animations in the group
+void AnimationGroup::setScene(Scene* scene) {
+    for (auto& anim : animations_) {
+        auto addToScene = std::dynamic_pointer_cast<AddToScene>(anim);
+        if (addToScene) {
+            addToScene->setScene(scene);
         }
     }
 }

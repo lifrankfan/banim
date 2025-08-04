@@ -80,6 +80,10 @@ namespace banim {
         timeline_.push(group);
     }
     
+    void Scene::addAnimatable(std::shared_ptr<Animatable> animatable) {
+        animatables_.push_back(animatable);
+    }
+    
     void Scene::wait(float duration) {
         timeline_.push(std::make_shared<Wait>(duration));
     }    
@@ -116,6 +120,18 @@ namespace banim {
             if (std::holds_alternative<std::shared_ptr<Animation>>(action)) {
                 // It's an animation
                 currentAnimation_ = std::get<std::shared_ptr<Animation>>(action);
+                
+                // Check if this is an AddToScene animation and set scene reference
+                auto addToScene = std::dynamic_pointer_cast<AddToScene>(currentAnimation_);
+                if (addToScene) {
+                    addToScene->setScene(this);
+                }
+                
+                // Check if this is an AnimationGroup and set scene for any AddToScene animations within
+                auto animGroup = std::dynamic_pointer_cast<AnimationGroup>(currentAnimation_);
+                if (animGroup) {
+                    animGroup->setScene(this);
+                }
             } else {
                 // It's an animatable addition
                 auto addAction = std::get<AddAction>(action);

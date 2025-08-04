@@ -12,6 +12,7 @@ namespace banim {
 class Animatable;
 class Animation;
 class AnimationGroup;
+class AddToScene;
 
 struct AddAction {
     std::shared_ptr<Animatable> animatable;
@@ -70,6 +71,9 @@ class Scene {
     void renderScene(cairo_t *cr);
     void update(float dt);
     void wait(float duration);
+    
+    // Method for AddToScene animation to add animatables directly
+    void addAnimatable(std::shared_ptr<Animatable> animatable);
 
   private:
     std::vector<std::shared_ptr<Animatable>> animatables_;

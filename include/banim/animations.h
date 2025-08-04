@@ -31,6 +31,7 @@ class PopIn : public Animation {
     float duration_;
     bool started_ = false;
     float targetW_ = -1.0f, targetH_ = -1.0f;
+    float targetAlpha_ = 1.0f; // Store the target alpha value
 };
 
 class MoveTo : public Animation {
@@ -192,6 +193,23 @@ class MoveLineStart : public Animation {
     bool initialized_ = false;
 };
 
+// Animation for adding objects to scene (can be used in groups)
+class AddToScene : public Animation {
+  public:
+    AddToScene(std::shared_ptr<Animatable> animatable, std::shared_ptr<Animation> spawnAnimation = nullptr);
+    
+    bool update(float dt) override;
+    
+    // Set the scene this will add to (called by Scene internally)
+    void setScene(Scene* scene) { scene_ = scene; }
+
+  private:
+    std::shared_ptr<Animatable> animatable_;
+    std::shared_ptr<Animation> spawnAnimation_;
+    Scene* scene_ = nullptr;
+    bool added_ = false;
+};
+
 // Animation group for parallel execution
 class AnimationGroup : public Animation {
   public:
@@ -202,6 +220,9 @@ class AnimationGroup : public Animation {
     void addAll(const std::vector<std::shared_ptr<Animation>>& animations);
     
     bool update(float dt) override;
+    
+    // Set scene for all AddToScene animations in the group
+    void setScene(Scene* scene);
     
     // Check if the group is empty
     bool empty() const { return animations_.empty(); }
