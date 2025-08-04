@@ -26,13 +26,16 @@ Rectangle& Rectangle::setBorderRadius(float radius) {
 void Rectangle::draw(cairo_t* cr) {
     if (!g_ctx) return;
     
+    extern Scene *g_currentScene;
+    if (!g_currentScene) return;
+    
     // Convert grid coordinates to pixel coordinates
     float windowWidth = static_cast<float>(g_ctx->width());
     float windowHeight = static_cast<float>(g_ctx->height());
     
-    // Use default grid configuration - this should ideally come from scene
-    float cellWidth = windowWidth / 16.0f;  // Default 16 cols
-    float cellHeight = windowHeight / 9.0f; // Default 9 rows
+    const GridConfig& gridConfig = g_currentScene->getGridConfig();
+    float cellWidth = windowWidth / static_cast<float>(gridConfig.cols);
+    float cellHeight = windowHeight / static_cast<float>(gridConfig.rows);
     
     float pixelX = gridPos_.x * cellWidth;
     float pixelY = gridPos_.y * cellHeight;
@@ -80,13 +83,16 @@ Circle::Circle(const GridCoord& gridPos, float gridRx, float gridRy,
 void Circle::draw(cairo_t *cr) {
     if (!g_ctx) return;
     
+    extern Scene *g_currentScene;
+    if (!g_currentScene) return;
+    
     // Convert grid coordinates to pixel coordinates
     float windowWidth = static_cast<float>(g_ctx->width());
     float windowHeight = static_cast<float>(g_ctx->height());
     
-    // Use default grid configuration - this should ideally come from scene
-    float cellWidth = windowWidth / 16.0f;  // Default 16 cols
-    float cellHeight = windowHeight / 9.0f; // Default 9 rows
+    const GridConfig& gridConfig = g_currentScene->getGridConfig();
+    float cellWidth = windowWidth / static_cast<float>(gridConfig.cols);
+    float cellHeight = windowHeight / static_cast<float>(gridConfig.rows);
     
     float pixelX = (gridPos_.x + 0.5f) * cellWidth;  // Center of grid cell
     float pixelY = (gridPos_.y + 0.5f) * cellHeight;
@@ -172,13 +178,16 @@ void Line::moveTo(const GridCoord& newStartPos) {
 void Line::draw(cairo_t *cr) {
     if (!g_ctx) return;
     
+    extern Scene *g_currentScene;
+    if (!g_currentScene) return;
+    
     // Convert grid coordinates to pixel coordinates
     float windowWidth = static_cast<float>(g_ctx->width());
     float windowHeight = static_cast<float>(g_ctx->height());
     
-    // Use default grid configuration - this should ideally come from scene
-    float cellWidth = windowWidth / 16.0f;  // Default 16 cols
-    float cellHeight = windowHeight / 9.0f; // Default 9 rows
+    const GridConfig& gridConfig = g_currentScene->getGridConfig();
+    float cellWidth = windowWidth / static_cast<float>(gridConfig.cols);
+    float cellHeight = windowHeight / static_cast<float>(gridConfig.rows);
     
     cairo_save(cr);
     
@@ -225,13 +234,16 @@ void Text::setFontSize(float size) { fontSize_ = size; }
 void Text::draw(cairo_t* cr) {
     if (!g_ctx) return;
     
+    extern Scene *g_currentScene;
+    if (!g_currentScene) return;
+    
     // Convert grid coordinates to pixel coordinates
     float windowWidth = static_cast<float>(g_ctx->width());
     float windowHeight = static_cast<float>(g_ctx->height());
     
-    // Use default grid configuration - this should ideally come from scene
-    float cellWidth = windowWidth / 16.0f;  // Default 16 cols
-    float cellHeight = windowHeight / 9.0f; // Default 9 rows
+    const GridConfig& gridConfig = g_currentScene->getGridConfig();
+    float cellWidth = windowWidth / static_cast<float>(gridConfig.cols);
+    float cellHeight = windowHeight / static_cast<float>(gridConfig.rows);
     
     float pixelX = (gridPos_.x + 0.5f) * cellWidth;  // Center of grid cell
     float pixelY = (gridPos_.y + 0.5f) * cellHeight;

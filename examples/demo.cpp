@@ -2,6 +2,7 @@
 #include "banim/scene.h"
 #include "banim/animatable.h"
 #include "banim/animations.h"
+#include "banim/block.h"
 #include <memory>
 
 using namespace banim;
@@ -11,8 +12,8 @@ int main() {
     if (!init(options))
         return 1;
 
-    // Create scene with grid system matching window size
-    GridConfig gridConfig(16, 9, true);  // Show grid initially
+    // Create scene with custom grid system 
+    GridConfig gridConfig(20, 12, true);  // 20x12 grid instead of 16x9, show grid initially
     Scene scene(gridConfig);
 
     // Create a rectangle at grid position (2, 2) with size 3x2 grid units
@@ -29,6 +30,15 @@ int main() {
     auto text = std::make_shared<Text>(GridCoord(12, 6), "Hello Grid!", 24.0f);
     text->setColor(0.0f, 0.8f, 0.2f, 1.0f);
     scene.add(text);
+
+    // Create a block with ports
+    auto block = std::make_shared<Block>(GridCoord(10, 1), 3.0f, 2.5f, "CPU");
+    block->setColor(0.6f, 0.2f, 0.8f, 1.0f); // Purple block
+    block->addPort(PortDirection::LEFT, "input");
+    block->addPort(PortDirection::RIGHT, "output1");
+    block->addPort(PortDirection::RIGHT, "output2");
+    block->addPort(PortDirection::TOP, "clock");
+    scene.add(block);
 
     // Create a line with waypoints connecting the shapes
     auto line = std::make_shared<Line>(GridCoord(2, 2), GridCoord(8, 4));
@@ -50,6 +60,11 @@ int main() {
     
     // Resize the circle
     scene.play(std::make_shared<ResizeTo>(circle, 2.5f, 2.5f));
+    
+    // Move and resize the block to show it's animatable
+    scene.play(std::make_shared<MoveTo>(block, GridCoord(1, 1)));
+    scene.wait(0.5f);
+    scene.play(std::make_shared<ResizeTo>(block, 4.0f, 3.0f));
     
     // Animate the line waypoints to create a wave effect
     scene.wait(0.5f);
