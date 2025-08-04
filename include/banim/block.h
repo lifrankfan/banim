@@ -47,6 +47,10 @@ public:
     void setLabelColor(float r, float g, float b, float a = 1.0f);
     void setLabelSize(float size) { labelSize_ = size; }
     
+    // Grid size access for wire connections
+    float getGridWidth() const { return gridSize_.x; }
+    float getGridHeight() const { return gridSize_.y; }
+    
     // Override from Rectangle to update ports when size changes
     void setAnimatableSize(float w, float h) override {
         Rectangle::setAnimatableSize(w, h);

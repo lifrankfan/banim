@@ -35,6 +35,7 @@ add_library(banim STATIC
   src/scene.cpp
   src/animations.cpp
   src/block.cpp
+  src/wire.cpp
 )
 
 # Public includes

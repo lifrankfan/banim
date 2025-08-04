@@ -18,6 +18,9 @@ Block::Block(const GridCoord& position, float gridWidth, float gridHeight,
     setFilled(true);
     setBorderRadius(8.0f);
     setStrokeWidth(2.0f);
+    
+    // Initialize port positions (empty initially)
+    updatePortPositions();
 }
 
 void Block::draw(cairo_t* cr) {
